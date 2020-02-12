@@ -1,8 +1,5 @@
 package me.shib.security.codefender;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,8 +8,6 @@ import java.util.Set;
 
 public abstract class Codefender {
 
-    private static final transient Gson gson = new GsonBuilder().setPrettyPrinting()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
     private static final transient Set<Codefender> codefenders = new HashSet<>();
 
     private transient CodefenderConfig config;
@@ -48,34 +43,12 @@ public abstract class Codefender {
         return qualifiedClasses;
     }
 
-    private static void processResults(List<CodefenderResult> results) {
-        for (CodefenderResult result : results) {
-            List<CodefenderFinding> vulnerabilities = result.getVulnerabilities();
-            StringBuilder content = new StringBuilder();
-            content.append("Project:\t").append(result.getProject()).append("\n");
-            content.append("Context:\t").append(result.getContext()).append("\n");
-            content.append("Language:\t").append(result.getLang()).append("\n");
-            content.append("Scanner:\t").append(result.getScanner()).append("\n");
-            content.append("Count:\t").append(vulnerabilities.size()).append("\n");
-            content.append("Vulnerabilities:").append("\n");
-            for (CodefenderFinding vulnerability : vulnerabilities) {
-                content.append("\n").append(vulnerability);
-            }
-            System.out.println(content);
-        }
-        try {
-            writeToFile(gson.toJson(results), new File("codefender-results.json"));
-        } catch (FileNotFoundException e) {
-            throw new CodefenderException(e);
-        }
-    }
-
-    static synchronized void start(CodefenderConfig config) throws CodefenderException {
+    static synchronized List<CodefenderResult> execute(CodefenderConfig config) throws CodefenderException {
         if (config == null) {
             config = CodefenderConfig.getInstance();
         }
         List<Codefender> codefenders = Codefender.getCodefends(config);
-        List<CodefenderResult> scannedResults = new ArrayList<>();
+        List<CodefenderResult> results = new ArrayList<>();
         if (codefenders.size() > 0) {
             try {
                 buildProject(config.getBuildScript(), config.getScanDir());
@@ -84,7 +57,7 @@ public abstract class Codefender {
                         codefender.getResult().setProject(config.getProject());
                         System.out.println("Now running scanner: " + codefender.getTool());
                         codefender.scan();
-                        scannedResults.add(codefender.getResult());
+                        results.add(codefender.getResult());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -92,10 +65,10 @@ public abstract class Codefender {
             } catch (IOException | InterruptedException e) {
                 throw new CodefenderException(e);
             }
-            processResults(scannedResults);
         } else {
             System.out.println("No scanners available to scan this code.");
         }
+        return results;
     }
 
     private static synchronized void buildProject(String buildScript, File scanDir) throws IOException, InterruptedException, CodefenderException {
