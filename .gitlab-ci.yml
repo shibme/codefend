@@ -12,7 +12,7 @@ stages:
 Maven Build:
   image: maven:3-jdk-8
   stage: "Build"
-  script: mvn clean install
+  script: mvn -s .m2/settings.xml clean deploy
   artifacts:
     expire_in: 1 hour
     paths:
@@ -20,10 +20,12 @@ Maven Build:
 
 Docker Build:
   stage: "Release"
+  variables:
+    DOCKER_IMAGE: "shibme/codefender"
   script:
-    - echo $CI_REGISTRY_PASSWORD | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE .
-    - docker push $CI_REGISTRY_IMAGE
-    - docker logout $CI_REGISTRY
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker build -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
+    - docker logout
   only:
     - master
