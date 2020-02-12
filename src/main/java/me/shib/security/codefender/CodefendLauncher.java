@@ -15,9 +15,11 @@ public final class CodefendLauncher {
     private static final transient Gson gson = new GsonBuilder().setPrettyPrinting()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
 
-    private static void processResults(List<CodefenderResult> results) {
+    private static boolean processResults(List<CodefenderResult> results) {
+        boolean vulnerable = false;
         for (CodefenderResult result : results) {
             List<CodefenderFinding> vulnerabilities = result.getVulnerabilities();
+            vulnerable |= vulnerabilities.size() > 0;
             StringBuilder content = new StringBuilder();
             content.append("Project:\t").append(result.getProject()).append("\n");
             content.append("Context:\t").append(result.getContext()).append("\n");
@@ -35,6 +37,7 @@ public final class CodefendLauncher {
         } catch (FileNotFoundException e) {
             throw new CodefenderException(e);
         }
+        return vulnerable;
     }
 
     public static void main(String[] args) {
@@ -44,6 +47,8 @@ public final class CodefendLauncher {
         Codefender.addScanner(new BundlerAudit(config));
         Codefender.addScanner(new RetirejsScanner(config));
         List<CodefenderResult> results = Codefender.execute(config);
-        processResults(results);
+        if (processResults(results)) {
+            System.exit(1);
+        }
     }
 }
