@@ -1,0 +1,29 @@
+image: docker:latest
+services:
+  - docker:dind
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+
+stages:
+  - "Build"
+  - "Release"
+
+Maven Build:
+  image: maven:3-jdk-8
+  stage: "Build"
+  script: mvn clean install
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - target/run-codefender.jar
+
+Docker Build:
+  stage: "Release"
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE
+    - docker logout $CI_REGISTRY
+  only:
+    - master
