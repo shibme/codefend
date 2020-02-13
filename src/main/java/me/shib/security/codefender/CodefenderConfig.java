@@ -148,6 +148,10 @@ public final class CodefenderConfig {
         return parseOnly;
     }
 
+    public GitRepo getGitRepo() {
+        return gitRepo;
+    }
+
     void init() {
         if (gitCredential == null) {
             gitCredential = buildGitCredential();

@@ -6,11 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
-class GitRepo {
-    private static transient GitRepo gitRepo = null;
-    private static transient boolean attemptedGitRepoOperation = false;
+public class GitRepo {
 
     private transient String repoSlug;
+    private transient String gitRepoWebURL;
     private transient String gitRepoHttpUri;
     private transient String gitRepoSshUri;
     private transient String gitRepoBranch;
@@ -23,6 +22,7 @@ class GitRepo {
         String repoName = urlSplit[urlSplit.length - 1];
         String owner = url.replaceFirst(host + "/", "");
         owner = removeEndingSequence(owner, "/" + repoName);
+        this.gitRepoWebURL = getWebURL(host, owner, repoName);
         this.gitRepoHttpUri = getHttpUri(host, owner, repoName);
         this.gitRepoSshUri = getSSHUri(host, owner, repoName);
         this.gitRepoBranch = gitRepoBranch;
@@ -86,6 +86,10 @@ class GitRepo {
         return new GitRepo(gitUri, gitBranch, gitCommit);
     }
 
+    private String getWebURL(String host, String owner, String repoName) {
+        return "https://" + host + "/" + owner + "/" + repoName;
+    }
+
     private String getHttpUri(String host, String owner, String repoName) {
         return "https://" + host + "/" + owner + "/" + repoName + ".git";
     }
@@ -117,7 +121,7 @@ class GitRepo {
         return url.replaceFirst(":", "/");
     }
 
-    String getRepoSlug() {
+    public String getRepoSlug() {
         if (repoSlug != null) {
             String url;
             if (gitRepoSshUri != null) {
@@ -198,5 +202,30 @@ class GitRepo {
                 throw new CodefenderException("Something went wrong. Please validate the branch name");
             }
         }
+    }
+
+    public String getGitRepoWebURL() {
+        return gitRepoWebURL;
+    }
+
+    public String getGitRepoHttpUri() {
+        return gitRepoHttpUri;
+    }
+
+    public String getGitRepoSshUri() {
+        return gitRepoSshUri;
+    }
+
+    public String getGitRepoBranch() {
+        return gitRepoBranch;
+    }
+
+    public String getGitRepoCommitHash() {
+        return gitRepoCommitHash;
+    }
+
+    @Override
+    public String toString() {
+        return getRepoSlug();
     }
 }

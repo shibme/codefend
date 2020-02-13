@@ -67,7 +67,7 @@ public final class RetirejsScanner extends Codefender {
                                 } else {
                                     title.append("Vulnerability found in ").append(result.getComponent());
                                 }
-                                CodefenderFinding vulnerability = newVulnerability(title.toString(),
+                                CodefenderVulnerability vulnerability = newVulnerability(title.toString(),
                                         getPriorityForSeverity(retireVuln.getSeverity()));
                                 vulnerability.setField("Build File Path", data.getFile());
                                 vulnerability.setField("Component", result.getComponent());

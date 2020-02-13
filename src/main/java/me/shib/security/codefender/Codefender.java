@@ -1,5 +1,9 @@
 package me.shib.security.codefender;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,6 +12,8 @@ import java.util.Set;
 
 public abstract class Codefender {
 
+    private static final transient Gson gson = new GsonBuilder().setPrettyPrinting()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
     private static final transient Set<Codefender> codefenders = new HashSet<>();
 
     private transient CodefenderConfig config;
@@ -87,7 +93,43 @@ public abstract class Codefender {
         pw.close();
     }
 
-    protected CodefenderFinding newVulnerability(String title, int priority) {
+    protected String getHash(File file, int lineNo, String type, String[] args) throws IOException {
+        return getHash(file, lineNo, lineNo, type, args);
+    }
+
+    protected String getHash(File file, int lineNo, String type) throws IOException {
+        return getHash(file, lineNo, lineNo, type, null);
+    }
+
+    protected String getHash(File file, int startLineNo, int endLineNo, String type) throws IOException {
+        return getHash(file, startLineNo, endLineNo, type, null);
+    }
+
+    protected String getHash(File file, int startLineNo, int endLineNo, String type, String[] args) throws IOException {
+        class HashableContent {
+            private String filePath;
+            private String snippet;
+            private String type;
+            private String[] args;
+        }
+        List<String> lines = readLinesFromFile(file);
+        if (startLineNo <= endLineNo && endLineNo <= lines.size() && startLineNo > 0) {
+            StringBuilder snippet = new StringBuilder();
+            snippet.append(lines.get(startLineNo - 1));
+            for (int i = startLineNo; i < endLineNo; i++) {
+                snippet.append("\n").append(lines.get(i));
+            }
+            HashableContent hashableContent = new HashableContent();
+            hashableContent.type = type;
+            hashableContent.filePath = file.getAbsolutePath().replaceFirst(config.getScanDir().getAbsolutePath(), "");
+            hashableContent.snippet = snippet.toString();
+            hashableContent.args = args;
+            return DigestUtils.sha1Hex(gson.toJson(hashableContent));
+        }
+        return null;
+    }
+
+    protected CodefenderVulnerability newVulnerability(String title, int priority) {
         return result.newVulnerability(title, priority);
     }
 

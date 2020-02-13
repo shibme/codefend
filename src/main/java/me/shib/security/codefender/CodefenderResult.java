@@ -9,7 +9,7 @@ final class CodefenderResult {
     private Codefender.Context context;
     private String scanner;
     private String scanDirPath;
-    private Map<String, CodefenderFinding> vulnerabilityMap;
+    private Map<String, CodefenderVulnerability> vulnerabilityMap;
 
     CodefenderResult(String project, Lang lang, Codefender.Context context, String scanner, String scanDirPath) {
         this.project = project;
@@ -20,11 +20,11 @@ final class CodefenderResult {
         this.vulnerabilityMap = new HashMap<>();
     }
 
-    CodefenderFinding newVulnerability(String title, int priority) {
-        return new CodefenderFinding(this, title, priority);
+    CodefenderVulnerability newVulnerability(String title, int priority) {
+        return new CodefenderVulnerability(this, title, priority);
     }
 
-    void updateVulnerability(CodefenderFinding vulnerability) {
+    void updateVulnerability(CodefenderVulnerability vulnerability) {
         StringBuilder key = new StringBuilder();
         List<String> keyList = new ArrayList<>(vulnerability.getKeys());
         Collections.sort(keyList);
@@ -58,7 +58,7 @@ final class CodefenderResult {
         return scanDirPath;
     }
 
-    public List<CodefenderFinding> getVulnerabilities() {
+    public List<CodefenderVulnerability> getVulnerabilities() {
         return new ArrayList<>(vulnerabilityMap.values());
     }
 }

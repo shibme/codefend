@@ -60,7 +60,7 @@ public final class BrakemanScanner extends Codefender {
     private void warningToVulnerability(BrakemanWarning warning) throws CodefenderException {
         String title = "Brakeman warning (" + warning.getWarning_type() + ") found in " + warning.getFile();
         int priority = BrakemanPriorityCalculator.getCodefendPriority(warning.getWarning_type(), warning.getConfidence());
-        CodefenderFinding vulnerability = newVulnerability(title, priority);
+        CodefenderVulnerability vulnerability = newVulnerability(title, priority);
         if (warning.getLink() != null) {
             vulnerability.setField("Type", "[" + warning.getWarning_type() + "](" + warning.getLink() + ")");
         } else {

@@ -70,7 +70,7 @@ public final class BundlerAudit extends Codefender {
             gemName = split[1].replace("\n", " ").trim();
         }
         String title = "Vulnerable Gem (" + advisory + ") - " + gemName;
-        CodefenderFinding vulnerability = newVulnerability(title, priority);
+        CodefenderVulnerability vulnerability = newVulnerability(title, priority);
         vulnerability.setField("Description", descriptionTitle);
         vulnerability.setField("Gem Name", gemName);
         vulnerability.setField("Gem Version", gemVersion);

@@ -2,6 +2,7 @@ package me.shib.security.codefender;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import me.shib.security.codefender.scanners.java.findsecbugs.FindSecBugsScanner;
 import me.shib.security.codefender.scanners.javascript.retirejs.RetirejsScanner;
 import me.shib.security.codefender.scanners.ruby.brakeman.BrakemanScanner;
 import me.shib.security.codefender.scanners.ruby.bundleraudit.BundlerAudit;
@@ -18,7 +19,7 @@ public final class CodefendLauncher {
     private static boolean processResults(List<CodefenderResult> results) {
         boolean vulnerable = false;
         for (CodefenderResult result : results) {
-            List<CodefenderFinding> vulnerabilities = result.getVulnerabilities();
+            List<CodefenderVulnerability> vulnerabilities = result.getVulnerabilities();
             vulnerable |= vulnerabilities.size() > 0;
             StringBuilder content = new StringBuilder();
             content.append("Project:\t").append(result.getProject()).append("\n");
@@ -27,7 +28,7 @@ public final class CodefendLauncher {
             content.append("Scanner:\t").append(result.getScanner()).append("\n");
             content.append("Count:\t").append(vulnerabilities.size()).append("\n");
             content.append("Vulnerabilities:").append("\n");
-            for (CodefenderFinding vulnerability : vulnerabilities) {
+            for (CodefenderVulnerability vulnerability : vulnerabilities) {
                 content.append("\n").append(vulnerability);
             }
             System.out.println(content);
@@ -46,6 +47,7 @@ public final class CodefendLauncher {
         Codefender.addScanner(new BrakemanScanner(config));
         Codefender.addScanner(new BundlerAudit(config));
         Codefender.addScanner(new RetirejsScanner(config));
+        Codefender.addScanner(new FindSecBugsScanner(config));
         List<CodefenderResult> results = Codefender.execute(config);
         if (processResults(results)) {
             System.exit(1);
