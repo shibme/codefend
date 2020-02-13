@@ -2,7 +2,7 @@ package me.shib.security.codefender;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import me.shib.security.codefender.scanners.java.findsecbugs.FindSecBugsScanner;
+import me.shib.security.codefender.scanners.java.dependencycheck.DependencyCheck;
 import me.shib.security.codefender.scanners.javascript.retirejs.RetirejsScanner;
 import me.shib.security.codefender.scanners.ruby.brakeman.BrakemanScanner;
 import me.shib.security.codefender.scanners.ruby.bundleraudit.BundlerAudit;
@@ -47,7 +47,7 @@ public final class CodefendLauncher {
         Codefender.addScanner(new BrakemanScanner(config));
         Codefender.addScanner(new BundlerAudit(config));
         Codefender.addScanner(new RetirejsScanner(config));
-        Codefender.addScanner(new FindSecBugsScanner(config));
+        Codefender.addScanner(new DependencyCheck(config));
         List<CodefenderResult> results = Codefender.execute(config);
         if (processResults(results)) {
             System.exit(1);
