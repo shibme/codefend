@@ -10,10 +10,10 @@ public class GitRepo {
 
     private transient String repoSlug;
     private transient String gitRepoWebURL;
-    private String gitRepoHttpUri;
-    private String gitRepoSshUri;
-    private String gitRepoBranch;
-    private String gitRepoCommitHash;
+    private transient String gitRepoHttpUri;
+    private transient String gitRepoSshUri;
+    private transient String gitRepoBranch;
+    private transient String gitRepoCommitHash;
 
     GitRepo(String gitUri, String gitRepoBranch, String gitRepoCommitHash) {
         init(gitUri, gitRepoBranch, gitRepoCommitHash);
@@ -151,7 +151,7 @@ public class GitRepo {
         return repoSlug;
     }
 
-    public synchronized void cloneRepo(GitCredential credential) throws CodefenderException {
+    synchronized void cloneRepo(GitCredential credential) throws CodefenderException {
         File currentDir = new File(System.getProperty("user.dir"));
         if (currentDir.list() != null) {
             if (Objects.requireNonNull(currentDir.list()).length > 0) {
@@ -167,8 +167,8 @@ public class GitRepo {
             cloneCommand.append("--branch ").append(this.gitRepoBranch).append(" ");
         }
         cloneCommand.append("--depth 1 ");
-        if (this.gitRepoSshUri != null || this.gitRepoHttpUri != null) {
-            String cloneUri;
+        String cloneUri;
+        if (credential != null) {
             if (credential.getSshPrivateKeyFile() != null) {
                 cloneUri = this.gitRepoSshUri;
                 File sshPrivateKeyFile = new File(System.getProperty("user.home") + File.separator +
@@ -182,20 +182,17 @@ public class GitRepo {
                 cloneCommand.append(this.gitRepoSshUri);
             } else {
                 cloneUri = this.gitRepoHttpUri;
-                if (credential.getGitUsername() != null && credential.getGitAccessToken() != null) {
-                    String[] splitUrl = this.gitRepoHttpUri.split("//");
-                    cloneCommand.append(splitUrl[0]).append("//").append(credential.getGitUsername())
-                            .append(":").append(credential.getGitAccessToken()).append("@").append(splitUrl[1]);
-                } else {
-                    cloneCommand.append(this.gitRepoHttpUri);
-                }
+                String[] splitUrl = this.gitRepoHttpUri.split("//");
+                cloneCommand.append(splitUrl[0]).append("//").append(credential.getGitUsername())
+                        .append(":").append(credential.getGitAccessToken()).append("@").append(splitUrl[1]);
             }
-            cloneCommand.append(" .");
-            System.out.println("Pulling Repository: " + cloneUri);
-            runGitCommand(cloneCommand.toString());
         } else {
-            throw new CodefenderException("No git repository was specified");
+            cloneUri = this.gitRepoHttpUri;
+            cloneCommand.append(this.gitRepoHttpUri);
         }
+        cloneCommand.append(" .");
+        System.out.println("Pulling Repository: " + cloneUri);
+        runGitCommand(cloneCommand.toString());
         GitRepo localRepo = getFromLocal();
         if (localRepo == null) {
             throw new CodefenderException("Failed to clone the repo");
