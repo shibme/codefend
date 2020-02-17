@@ -99,8 +99,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <finalName>run-codefender</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
+                    <finalName>codefender</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
