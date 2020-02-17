@@ -15,7 +15,7 @@ public class GitRepo {
     private transient String gitRepoBranch;
     private transient String gitRepoCommitHash;
 
-    GitRepo(String gitUri, String gitRepoBranch, String gitRepoCommitHash) {
+    public GitRepo(String gitUri, String gitRepoBranch, String gitRepoCommitHash) {
         init(gitUri, gitRepoBranch, gitRepoCommitHash);
     }
 

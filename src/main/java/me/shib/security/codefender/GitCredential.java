@@ -8,7 +8,7 @@ public class GitCredential {
     private String gitAccessToken;
     private File sshPrivateKeyFile;
 
-    GitCredential(String gitUsername, String gitAccessToken) {
+    public GitCredential(String gitUsername, String gitAccessToken) {
         this.gitUsername = gitUsername;
         if (this.gitUsername == null || this.gitUsername.isEmpty()) {
             this.gitUsername = "git";
@@ -16,7 +16,7 @@ public class GitCredential {
         this.gitAccessToken = gitAccessToken;
     }
 
-    GitCredential(File sshPrivateKeyFile) {
+    public GitCredential(File sshPrivateKeyFile) {
         this.sshPrivateKeyFile = sshPrivateKeyFile;
     }
 
