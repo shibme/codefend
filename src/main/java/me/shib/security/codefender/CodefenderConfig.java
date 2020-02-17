@@ -35,7 +35,7 @@ public final class CodefenderConfig {
     private Boolean parseOnly;
 
     public CodefenderConfig(String project, String scanDirPath, String buildScript, Lang lang,
-                            Codefender.Context context, String tool, GitRepo gitRepo, GitCredential gitCredential, Boolean parseOnly) {
+                            Codefender.Context context, String tool, Boolean parseOnly, GitRepo gitRepo, GitCredential gitCredential) {
         this.project = project;
         this.scanDirPath = scanDirPath;
         this.buildScript = buildScript;
@@ -126,10 +126,6 @@ public final class CodefenderConfig {
         return gitCredential;
     }
 
-    public void setGitCredential(GitCredential gitCredential) {
-        this.gitCredential = gitCredential;
-    }
-
     public Boolean isParseOnly() {
         return parseOnly;
     }
@@ -138,16 +134,17 @@ public final class CodefenderConfig {
         return gitRepo;
     }
 
-    public void setGitRepo(GitRepo gitRepo) {
-        this.gitRepo = gitRepo;
-    }
-
     void init() {
         if (gitCredential == null) {
             gitCredential = buildGitCredentialFromEnv();
         }
         if (gitRepo == null) {
             gitRepo = buildGitRepoFromEnv();
+        }
+        if (gitRepo != null) {
+            gitRepo.cloneRepo(gitCredential);
+        } else {
+            gitRepo = new GitRepo();
         }
         if (project == null) {
             project = envValue(CODEFENDER_PROJECT);
@@ -197,20 +194,18 @@ public final class CodefenderConfig {
     }
 
     private synchronized GitCredential buildGitCredentialFromEnv() {
-        if (gitCredential == null) {
-            String gitUsername = envValue(CODEFENDER_GIT_USERNAME);
-            String gitAccessToken = envValue(CODEFENDER_GIT_TOKEN);
-            String sshPrivateKeyFilePath = envValue(CODEFENDER_GIT_SSHKEY);
-            if (sshPrivateKeyFilePath != null) {
-                File sshPrivateKeyFile = new File(sshPrivateKeyFilePath);
-                if (sshPrivateKeyFile.exists()) {
-                    gitCredential = new GitCredential(sshPrivateKeyFile);
-                }
-            }
-            if (gitCredential == null && gitAccessToken != null) {
-                gitCredential = new GitCredential(gitUsername, gitAccessToken);
+        String gitUsername = envValue(CODEFENDER_GIT_USERNAME);
+        String gitAccessToken = envValue(CODEFENDER_GIT_TOKEN);
+        String sshPrivateKeyFilePath = envValue(CODEFENDER_GIT_SSHKEY);
+        if (sshPrivateKeyFilePath != null) {
+            File sshPrivateKeyFile = new File(sshPrivateKeyFilePath);
+            if (sshPrivateKeyFile.exists()) {
+                return new GitCredential(sshPrivateKeyFile);
             }
         }
-        return gitCredential;
+        if (gitAccessToken != null) {
+            return new GitCredential(gitUsername, gitAccessToken);
+        }
+        return null;
     }
 }

@@ -174,7 +174,7 @@ public class GitRepo {
                 File sshPrivateKeyFile = new File(System.getProperty("user.home") + File.separator +
                         ".ssh" + File.separator + "id_rsa");
                 try {
-                    Files.copy(sshPrivateKeyFile.toPath(), sshPrivateKeyFile.toPath(),
+                    Files.copy(credential.getSshPrivateKeyFile().toPath(), sshPrivateKeyFile.toPath(),
                             StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     throw new CodefenderException(e);
@@ -191,7 +191,7 @@ public class GitRepo {
             cloneCommand.append(this.gitRepoHttpUri);
         }
         cloneCommand.append(" .");
-        System.out.println("Pulling Repository: " + cloneUri);
+        System.out.println("Cloning Repository: " + cloneUri);
         runGitCommand(cloneCommand.toString());
         GitRepo localRepo = getFromLocal();
         if (localRepo == null) {

@@ -53,24 +53,15 @@ public abstract class Codefender {
         return qualifiedClasses;
     }
 
-    private static synchronized void prepareScan(CodefenderConfig config) {
+    private static synchronized void prepareScanners(CodefenderConfig config) {
         Codefender.addScanner(new BrakemanScanner(config));
         Codefender.addScanner(new BundlerAudit(config));
         Codefender.addScanner(new RetirejsScanner(config));
         Codefender.addScanner(new DependencyCheck(config));
-        GitRepo gitRepo = config.getGitRepo();
-        if (gitRepo != null) {
-            gitRepo.cloneRepo(config.getGitCredential());
-        } else {
-            config.setGitRepo(new GitRepo());
-        }
     }
 
     public static synchronized List<Codefender> getScanners(CodefenderConfig config) throws CodefenderException {
-        if (config == null) {
-            config = CodefenderConfig.getInstance();
-        }
-        prepareScan(config);
+        prepareScanners(config);
         List<Codefender> scanners = Codefender.getCodefenders(config);
         if (scanners.size() > 0) {
             try {

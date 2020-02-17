@@ -37,7 +37,6 @@ public final class CodefendLauncher {
     }
 
     public static void main(String[] args) {
-        System.out.println("Codefender: Starting independent run");
         CodefenderConfig config = CodefenderConfig.getInstance();
         List<Codefender> scanners = Codefender.getScanners(config);
         for (Codefender codefender : scanners) {
