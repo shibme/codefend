@@ -156,7 +156,7 @@ public final class RetirejsScanner extends Codefender {
     }
 
     @Override
-    protected Lang getLang() {
+    public Lang getLang() {
         return Lang.JavaScript;
     }
 

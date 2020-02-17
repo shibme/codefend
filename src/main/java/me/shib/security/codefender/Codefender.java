@@ -2,6 +2,10 @@ package me.shib.security.codefender;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import me.shib.security.codefender.scanners.java.dependencycheck.DependencyCheck;
+import me.shib.security.codefender.scanners.javascript.retirejs.RetirejsScanner;
+import me.shib.security.codefender.scanners.ruby.brakeman.BrakemanScanner;
+import me.shib.security.codefender.scanners.ruby.bundleraudit.BundlerAudit;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
@@ -25,11 +29,11 @@ public abstract class Codefender {
                 getContext(), getTool(), config.getScanDirPath());
     }
 
-    public static void addScanner(Codefender codefender) {
+    static synchronized void addScanner(Codefender codefender) {
         codefenders.add(codefender);
     }
 
-    private static synchronized List<Codefender> getCodefends(CodefenderConfig config) {
+    private static synchronized List<Codefender> getCodefenders(CodefenderConfig config) {
         List<Codefender> qualifiedClasses = new ArrayList<>();
         System.out.println("Attempting to run for Language: " + config.getLang());
         if (config.getLang() != null) {
@@ -49,24 +53,30 @@ public abstract class Codefender {
         return qualifiedClasses;
     }
 
-    static synchronized List<CodefenderResult> execute(CodefenderConfig config) throws CodefenderException {
+    private static synchronized void prepareScan(CodefenderConfig config) {
+        Codefender.addScanner(new BrakemanScanner(config));
+        Codefender.addScanner(new BundlerAudit(config));
+        Codefender.addScanner(new RetirejsScanner(config));
+        Codefender.addScanner(new DependencyCheck(config));
+        GitRepo gitRepo = config.getGitRepo();
+        if (gitRepo != null) {
+            gitRepo.cloneRepo(config.getGitCredential());
+        } else {
+            config.setGitRepo(new GitRepo());
+        }
+    }
+
+    public static synchronized List<Codefender> getScanners(CodefenderConfig config) throws CodefenderException {
         if (config == null) {
             config = CodefenderConfig.getInstance();
         }
-        List<Codefender> codefenders = Codefender.getCodefends(config);
-        List<CodefenderResult> results = new ArrayList<>();
-        if (codefenders.size() > 0) {
+        prepareScan(config);
+        List<Codefender> scanners = Codefender.getCodefenders(config);
+        if (scanners.size() > 0) {
             try {
                 buildProject(config.getBuildScript(), config.getScanDir());
-                for (Codefender codefender : codefenders) {
-                    try {
-                        codefender.getResult().setProject(config.getProject());
-                        System.out.println("Now running scanner: " + codefender.getTool());
-                        codefender.scan();
-                        results.add(codefender.getResult());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                for (Codefender codefender : scanners) {
+                    codefender.result.setProject(config.getProject());
                 }
             } catch (IOException | InterruptedException e) {
                 throw new CodefenderException(e);
@@ -74,7 +84,7 @@ public abstract class Codefender {
         } else {
             System.out.println("No scanners available to scan this code.");
         }
-        return results;
+        return scanners;
     }
 
     private static synchronized void buildProject(String buildScript, File scanDir) throws IOException, InterruptedException, CodefenderException {
@@ -160,15 +170,27 @@ public abstract class Codefender {
         return content.toString();
     }
 
-    private CodefenderResult getResult() {
-        return result;
+    public String getProject() {
+        return result.getProject();
+    }
+
+    public String getScanner() {
+        return result.getScanner();
+    }
+
+    public String getScanDirPath() {
+        return result.getScanDirPath();
+    }
+
+    public List<CodefenderVulnerability> getVulnerabilities() {
+        return result.getVulnerabilities();
     }
 
     protected boolean isParserOnly() {
         return config.isParseOnly();
     }
 
-    protected abstract Lang getLang();
+    public abstract Lang getLang();
 
     public abstract String getTool();
 

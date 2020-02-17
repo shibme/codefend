@@ -31,24 +31,18 @@ public final class CodefenderConfig {
     private Lang lang;
     private Codefender.Context context;
     private String tool;
-    private String gitRepoUri;
-    private String gitRepoBranch;
-    private String gitRepoCommitHash;
     private GitCredential gitCredential;
     private Boolean parseOnly;
 
     public CodefenderConfig(String project, String scanDirPath, String buildScript, Lang lang,
-                            Codefender.Context context, String tool, String gitRepoUri, String gitRepoBranch,
-                            String gitRepoCommitHash, GitCredential gitCredential, Boolean parseOnly) {
+                            Codefender.Context context, String tool, GitRepo gitRepo, GitCredential gitCredential, Boolean parseOnly) {
         this.project = project;
         this.scanDirPath = scanDirPath;
         this.buildScript = buildScript;
         this.lang = lang;
         this.context = context;
         this.tool = tool;
-        this.gitRepoUri = gitRepoUri;
-        this.gitRepoBranch = gitRepoBranch;
-        this.gitRepoCommitHash = gitRepoCommitHash;
+        this.gitRepo = gitRepo;
         this.gitCredential = gitCredential;
         this.parseOnly = parseOnly;
         init();
@@ -58,7 +52,14 @@ public final class CodefenderConfig {
         init();
     }
 
-    private static synchronized GitRepo buildGitRepoFromEnv() {
+    static synchronized CodefenderConfig getInstance() {
+        if (config == null) {
+            config = new CodefenderConfig();
+        }
+        return config;
+    }
+
+    private synchronized GitRepo buildGitRepoFromEnv() {
         String gitUri = envValue(CODEFENDER_GIT_REPO);
         if (gitUri == null || gitUri.isEmpty()) {
             return null;
@@ -68,7 +69,7 @@ public final class CodefenderConfig {
         return new GitRepo(gitUri, gitBranch, gitCommit);
     }
 
-    private static String envValue(String var) {
+    private String envValue(String var) {
         String value = System.getenv(var);
         if (value != null && !value.isEmpty()) {
             return value;
@@ -76,7 +77,7 @@ public final class CodefenderConfig {
         return null;
     }
 
-    private static Codefender.Context buildContextFromEnv() {
+    private Codefender.Context buildContextFromEnv() {
         try {
             return Codefender.Context.valueOf(envValue(CODEFENDER_CONTEXT));
         } catch (Exception e) {
@@ -84,7 +85,7 @@ public final class CodefenderConfig {
         }
     }
 
-    private static Lang buildLangFromEnvOrContent(File scanDir) {
+    private Lang buildLangFromEnvOrContent(File scanDir) {
         try {
             return Lang.valueOf(envValue(CODEFENDER_LANG));
         } catch (Exception e) {
@@ -92,16 +93,9 @@ public final class CodefenderConfig {
         }
     }
 
-    private static boolean buildParseOnlyFromEnv() {
+    private boolean buildParseOnlyFromEnv() {
         String parseOnlyStr = envValue(CODEFENDER_PARSEONLY);
         return parseOnlyStr != null && parseOnlyStr.equalsIgnoreCase("TRUE");
-    }
-
-    static synchronized CodefenderConfig getInstance() {
-        if (config == null) {
-            config = new CodefenderConfig();
-        }
-        return config;
     }
 
     public String getScanDirPath() {
@@ -128,20 +122,12 @@ public final class CodefenderConfig {
         return tool;
     }
 
-    public String getGitRepoUri() {
-        return gitRepoUri;
-    }
-
-    public String getGitRepoBranch() {
-        return gitRepoBranch;
-    }
-
-    public String getGitRepoCommitHash() {
-        return gitRepoCommitHash;
-    }
-
     public GitCredential getGitCredential() {
         return gitCredential;
+    }
+
+    public void setGitCredential(GitCredential gitCredential) {
+        this.gitCredential = gitCredential;
     }
 
     public Boolean isParseOnly() {
@@ -152,16 +138,16 @@ public final class CodefenderConfig {
         return gitRepo;
     }
 
+    public void setGitRepo(GitRepo gitRepo) {
+        this.gitRepo = gitRepo;
+    }
+
     void init() {
         if (gitCredential == null) {
-            gitCredential = buildGitCredential();
+            gitCredential = buildGitCredentialFromEnv();
         }
         if (gitRepo == null) {
-            if (gitRepoUri == null) {
-                gitRepo = buildGitRepoFromEnv();
-            } else {
-                gitRepo = new GitRepo(gitRepoUri, gitRepoBranch, gitRepoCommitHash);
-            }
+            gitRepo = buildGitRepoFromEnv();
         }
         if (project == null) {
             project = envValue(CODEFENDER_PROJECT);
@@ -210,7 +196,7 @@ public final class CodefenderConfig {
         return null;
     }
 
-    synchronized GitCredential buildGitCredential() {
+    private synchronized GitCredential buildGitCredentialFromEnv() {
         if (gitCredential == null) {
             String gitUsername = envValue(CODEFENDER_GIT_USERNAME);
             String gitAccessToken = envValue(CODEFENDER_GIT_TOKEN);

@@ -139,7 +139,7 @@ public final class BundlerAudit extends Codefender {
     }
 
     @Override
-    protected Lang getLang() {
+    public Lang getLang() {
         return Lang.Ruby;
     }
 

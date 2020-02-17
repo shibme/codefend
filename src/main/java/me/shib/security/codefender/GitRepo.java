@@ -10,23 +10,27 @@ public class GitRepo {
 
     private transient String repoSlug;
     private transient String gitRepoWebURL;
-    private transient String gitRepoHttpUri;
-    private transient String gitRepoSshUri;
-    private transient String gitRepoBranch;
-    private transient String gitRepoCommitHash;
+    private String gitRepoHttpUri;
+    private String gitRepoSshUri;
+    private String gitRepoBranch;
+    private String gitRepoCommitHash;
 
     GitRepo(String gitUri, String gitRepoBranch, String gitRepoCommitHash) {
-        String url = cleanRepoUrl(gitUri);
-        String[] urlSplit = url.split("/");
-        String host = urlSplit[0];
-        String repoName = urlSplit[urlSplit.length - 1];
-        String owner = url.replaceFirst(host + "/", "");
-        owner = removeEndingSequence(owner, "/" + repoName);
-        this.gitRepoWebURL = getWebURL(host, owner, repoName);
-        this.gitRepoHttpUri = getHttpUri(host, owner, repoName);
-        this.gitRepoSshUri = getSSHUri(host, owner, repoName);
-        this.gitRepoBranch = gitRepoBranch;
-        this.gitRepoCommitHash = gitRepoCommitHash;
+        init(gitUri, gitRepoBranch, gitRepoCommitHash);
+    }
+
+    GitRepo() throws CodefenderException {
+        File gitDir = new File(".git");
+        if (!gitDir.exists() || !gitDir.isDirectory()) {
+            throw new CodefenderException("Not a Git Repository");
+        }
+        String gitUri = getGitUrlFromLocalRepo();
+        if (gitUri == null) {
+            throw new CodefenderException("Not a Git Repository");
+        }
+        String gitBranch = getGitBranchFromLocalRepo();
+        String gitCommit = getGitCommitFromLocalRepo();
+        init(gitUri, gitBranch, gitCommit);
     }
 
     private static String runGitCommand(String gitCommand) throws CodefenderException {
@@ -73,17 +77,25 @@ public class GitRepo {
     }
 
     private static GitRepo getFromLocal() {
-        File gitDir = new File(".git");
-        if (!gitDir.exists() || !gitDir.isDirectory()) {
+        try {
+            return new GitRepo();
+        } catch (CodefenderException e) {
             return null;
         }
-        String gitUri = getGitUrlFromLocalRepo();
-        if (gitUri == null) {
-            return null;
-        }
-        String gitBranch = getGitBranchFromLocalRepo();
-        String gitCommit = getGitCommitFromLocalRepo();
-        return new GitRepo(gitUri, gitBranch, gitCommit);
+    }
+
+    private void init(String gitUri, String gitRepoBranch, String gitRepoCommitHash) {
+        String url = cleanRepoUrl(gitUri);
+        String[] urlSplit = url.split("/");
+        String host = urlSplit[0];
+        String repoName = urlSplit[urlSplit.length - 1];
+        String owner = url.replaceFirst(host + "/", "");
+        owner = removeEndingSequence(owner, "/" + repoName);
+        this.gitRepoWebURL = getWebURL(host, owner, repoName);
+        this.gitRepoHttpUri = getHttpUri(host, owner, repoName);
+        this.gitRepoSshUri = getSSHUri(host, owner, repoName);
+        this.gitRepoBranch = gitRepoBranch;
+        this.gitRepoCommitHash = gitRepoCommitHash;
     }
 
     private String getWebURL(String host, String owner, String repoName) {
@@ -139,7 +151,7 @@ public class GitRepo {
         return repoSlug;
     }
 
-    synchronized void cloneRepo(GitCredential credential) throws CodefenderException {
+    public synchronized void cloneRepo(GitCredential credential) throws CodefenderException {
         File currentDir = new File(System.getProperty("user.dir"));
         if (currentDir.list() != null) {
             if (Objects.requireNonNull(currentDir.list()).length > 0) {

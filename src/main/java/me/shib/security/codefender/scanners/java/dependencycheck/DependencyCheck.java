@@ -28,7 +28,7 @@ public final class DependencyCheck extends Codefender {
     }
 
     @Override
-    protected Lang getLang() {
+    public Lang getLang() {
         return Lang.Java;
     }
 

@@ -48,7 +48,7 @@ public final class FindSecBugsScanner extends Codefender {
     }
 
     @Override
-    protected Lang getLang() {
+    public Lang getLang() {
         return scannerLang;
     }
 

@@ -58,7 +58,7 @@ final class CodefenderResult {
         return scanDirPath;
     }
 
-    public List<CodefenderVulnerability> getVulnerabilities() {
+    List<CodefenderVulnerability> getVulnerabilities() {
         return new ArrayList<>(vulnerabilityMap.values());
     }
 }
