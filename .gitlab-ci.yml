@@ -16,7 +16,7 @@ Maven Build:
   artifacts:
     expire_in: 1 hour
     paths:
-      - target/run-codefender.jar
+      - target/codefender-jar-with-dependencies.jar
 
 Docker Build:
   stage: "Release"
