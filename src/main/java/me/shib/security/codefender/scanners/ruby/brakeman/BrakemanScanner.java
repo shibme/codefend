@@ -41,10 +41,8 @@ public final class BrakemanScanner extends Codefender {
 
     @Override
     public void scan() throws CodefenderException, IOException, InterruptedException {
-        if (!isParserOnly()) {
-            brakemanOutput.delete();
-            runBrakeman();
-        }
+        brakemanOutput.delete();
+        runBrakeman();
         processBrakemanResult();
     }
 

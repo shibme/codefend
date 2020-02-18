@@ -186,10 +186,8 @@ public final class DependencyCheck extends Codefender {
 
     @Override
     public void scan() throws IOException, InterruptedException, CodefenderException {
-        if (!isParserOnly()) {
-            dependencyCheckReportFile.delete();
-            runDependecyCheck();
-        }
+        dependencyCheckReportFile.delete();
+        runDependecyCheck();
         DependencyCheckResult dependencyCheckResult = DependencyCheckResult.getResult(dependencyCheckReportFile);
         processDependencyCheckReport(dependencyCheckResult);
     }

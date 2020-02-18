@@ -468,9 +468,7 @@ public final class FindSecBugsScanner extends Codefender {
         else
             buildType = java_Gradle;
 
-        if (!isParserOnly()) {
-            runFindSecBugs(buildType);
-        }
+        runFindSecBugs(buildType);
         processFindSecBugsResult(buildType);
     }
 }

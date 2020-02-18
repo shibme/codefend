@@ -155,11 +155,9 @@ public final class BundlerAudit extends Codefender {
 
     @Override
     public void scan() throws Exception {
-        if (!isParserOnly()) {
-            bundlerAuditOutput.delete();
-            updateBundlerAuditDatabase();
-            runBundlerAudit();
-        }
+        bundlerAuditOutput.delete();
+        updateBundlerAuditDatabase();
+        runBundlerAudit();
         parseBundlerAuditResult();
     }
 }

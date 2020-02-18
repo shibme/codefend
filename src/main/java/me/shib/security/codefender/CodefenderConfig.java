@@ -12,7 +12,6 @@ public final class CodefenderConfig {
     private static final transient String CODEFENDER_LANG = "CODEFENDER_LANG";
     private static final transient String CODEFENDER_TOOL = "CODEFENDER_TOOL";
     private static final transient String CODEFENDER_BUILDSCRIPT = "CODEFENDER_BUILDSCRIPT";
-    private static final transient String CODEFENDER_PARSEONLY = "CODEFENDER_PARSEONLY";
     private static final transient String CODEFENDER_GIT_REPO = "CODEFENDER_GIT_REPO";
     private static final transient String CODEFENDER_GIT_BRANCH = "CODEFENDER_GIT_BRANCH";
     private static final transient String CODEFENDER_GIT_COMMIT = "CODEFENDER_GIT_COMMIT";
@@ -32,7 +31,6 @@ public final class CodefenderConfig {
     private Codefender.Context context;
     private String tool;
     private GitCredential gitCredential;
-    private Boolean parseOnly;
 
     public CodefenderConfig(String project, String scanDirPath, String buildScript, Lang lang,
                             Codefender.Context context, String tool, Boolean parseOnly, GitRepo gitRepo, GitCredential gitCredential) {
@@ -44,7 +42,6 @@ public final class CodefenderConfig {
         this.tool = tool;
         this.gitRepo = gitRepo;
         this.gitCredential = gitCredential;
-        this.parseOnly = parseOnly;
         init();
     }
 
@@ -93,11 +90,6 @@ public final class CodefenderConfig {
         }
     }
 
-    private boolean buildParseOnlyFromEnv() {
-        String parseOnlyStr = envValue(CODEFENDER_PARSEONLY);
-        return parseOnlyStr != null && parseOnlyStr.equalsIgnoreCase("TRUE");
-    }
-
     public String getScanDirPath() {
         return scanDirPath;
     }
@@ -124,10 +116,6 @@ public final class CodefenderConfig {
 
     public GitCredential getGitCredential() {
         return gitCredential;
-    }
-
-    public Boolean isParseOnly() {
-        return parseOnly;
     }
 
     public GitRepo getGitRepo() {
@@ -171,9 +159,6 @@ public final class CodefenderConfig {
         }
         if (buildScript == null) {
             buildScript = envValue(CODEFENDER_BUILDSCRIPT);
-        }
-        if (parseOnly == null) {
-            parseOnly = buildParseOnlyFromEnv();
         }
     }
 

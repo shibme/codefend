@@ -177,10 +177,6 @@ public abstract class Codefender {
         return result.getVulnerabilities();
     }
 
-    protected boolean isParserOnly() {
-        return config.isParseOnly();
-    }
-
     public abstract Lang getLang();
 
     public abstract String getTool();

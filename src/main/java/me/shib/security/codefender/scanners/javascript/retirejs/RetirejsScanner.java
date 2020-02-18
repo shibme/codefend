@@ -172,11 +172,9 @@ public final class RetirejsScanner extends Codefender {
 
     @Override
     public void scan() throws CodefenderException, IOException, InterruptedException {
-        if (!isParserOnly()) {
-            retireJsResultFile.delete();
-            npmProjectBuild();
-            runRetireJS();
-        }
+        retireJsResultFile.delete();
+        npmProjectBuild();
+        runRetireJS();
         parseResultData(retireJsResultFile);
     }
 }
