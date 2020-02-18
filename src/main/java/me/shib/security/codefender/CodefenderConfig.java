@@ -33,7 +33,7 @@ public final class CodefenderConfig {
     private GitCredential gitCredential;
 
     public CodefenderConfig(String project, String scanDirPath, String buildScript, Lang lang,
-                            Codefender.Context context, String tool, Boolean parseOnly, GitRepo gitRepo, GitCredential gitCredential) {
+                            Codefender.Context context, String tool, GitRepo gitRepo, GitCredential gitCredential) {
         this.project = project;
         this.scanDirPath = scanDirPath;
         this.buildScript = buildScript;
