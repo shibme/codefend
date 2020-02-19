@@ -25,6 +25,14 @@ final class CodefenderResult {
     }
 
     void updateVulnerability(CodefenderVulnerability vulnerability) {
+        vulnerability.addKey(project);
+        vulnerability.addTag(project);
+        vulnerability.addKey(lang.toString());
+        vulnerability.addTag(lang.toString());
+        vulnerability.addKey(context.toString());
+        vulnerability.addTag(context.toString());
+        vulnerability.addKey(scanner);
+        vulnerability.addTag(scanner);
         StringBuilder key = new StringBuilder();
         List<String> keyList = new ArrayList<>(vulnerability.getKeys());
         Collections.sort(keyList);

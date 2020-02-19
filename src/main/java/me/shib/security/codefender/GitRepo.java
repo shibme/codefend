@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class GitRepo {
 
-    private transient String repoSlug;
+    private transient String gitRepoSlug;
     private transient String gitRepoWebURL;
     private transient String gitRepoHttpUri;
     private transient String gitRepoSshUri;
@@ -91,6 +91,7 @@ public class GitRepo {
         String repoName = urlSplit[urlSplit.length - 1];
         String owner = url.replaceFirst(host + "/", "");
         owner = removeEndingSequence(owner, "/" + repoName);
+        this.gitRepoSlug = owner + "/" + repoName;
         this.gitRepoWebURL = getWebURL(host, owner, repoName);
         this.gitRepoHttpUri = getHttpUri(host, owner, repoName);
         this.gitRepoSshUri = getSSHUri(host, owner, repoName);
@@ -133,22 +134,8 @@ public class GitRepo {
         return url.replaceFirst(":", "/");
     }
 
-    public String getRepoSlug() {
-        if (repoSlug != null) {
-            String url;
-            if (gitRepoSshUri != null) {
-                url = gitRepoSshUri;
-            } else {
-                url = gitRepoHttpUri;
-            }
-            String[] urlSplit = url.split("/");
-            String host = urlSplit[0];
-            String repoName = urlSplit[urlSplit.length - 1];
-            String owner = url.replaceFirst(host + "/", "");
-            owner = removeEndingSequence(owner, "/" + repoName);
-            repoSlug = owner + "/" + repoName;
-        }
-        return repoSlug;
+    public String getGitRepoSlug() {
+        return gitRepoSlug;
     }
 
     synchronized void cloneRepo(GitCredential credential) throws CodefenderException {
@@ -235,6 +222,6 @@ public class GitRepo {
 
     @Override
     public String toString() {
-        return getRepoSlug();
+        return getGitRepoSlug();
     }
 }

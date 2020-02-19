@@ -137,7 +137,11 @@ public final class CodefenderConfig {
         if (project == null) {
             project = envValue(CODEFENDER_PROJECT);
             if (project == null || project.isEmpty()) {
-                project = "Codefend_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS").format(new Date().getTime());
+                if (gitRepo != null) {
+                    project = gitRepo.getGitRepoSlug();
+                } else {
+                    project = "Codefend_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS").format(new Date().getTime());
+                }
             }
         }
         if (scanDirPath == null) {
