@@ -18,16 +18,17 @@ public final class RetirejsScanner extends Codefend {
         super(config);
     }
 
-    private static int getPriorityForSeverity(String severity) {
+    private static CodefendPriority getPriorityForSeverity(String severity) {
         switch (severity) {
             case "critical":
             case "urgent":
+                return CodefendPriority.P0;
             case "high":
-                return 1;
+                return CodefendPriority.P1;
             case "low":
-                return 3;
+                return CodefendPriority.P2;
             default:
-                return 2;
+                return CodefendPriority.P3;
         }
     }
 
@@ -48,8 +49,8 @@ public final class RetirejsScanner extends Codefend {
         retirejsExecutor("retire -p --outputformat json --outputpath " + retireJsResultFile.getAbsolutePath());
     }
 
-    private void parseResultData(File file) throws IOException, CodefendException {
-        List<RetirejsResult.Data> dataList = RetirejsResult.getResult(file);
+    private void parseResultData() throws IOException, CodefendException {
+        List<RetirejsResult.Data> dataList = RetirejsResult.getResult(RetirejsScanner.retireJsResultFile);
         if (dataList != null) {
             for (RetirejsResult.Data data : dataList) {
                 if (data.getResults() != null) {
@@ -171,10 +172,10 @@ public final class RetirejsScanner extends Codefend {
     }
 
     @Override
-    public void scan() throws CodefendException, IOException, InterruptedException {
+    protected void scan() throws CodefendException, IOException, InterruptedException {
         retireJsResultFile.delete();
         npmProjectBuild();
         runRetireJS();
-        parseResultData(retireJsResultFile);
+        parseResultData();
     }
 }

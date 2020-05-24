@@ -16,20 +16,20 @@ public final class BundlerAudit extends Codefend {
         super(config);
     }
 
-    private static int getPriorityNumberForName(String priorityName) {
+    private static CodefendPriority getPriorityNumberForName(String priorityName) {
         switch (priorityName) {
-            case "High":
-                return 1;
-            case "Medium":
-                return 2;
-            case "Low":
-                return 3;
             case "Urgent":
-                return 0;
+                return CodefendPriority.P0;
             case "Critical":
-                return 0;
+                return CodefendPriority.P0;
+            case "High":
+                return CodefendPriority.P1;
+            case "Medium":
+                return CodefendPriority.P2;
+            case "Low":
+                return CodefendPriority.P3;
             default:
-                return 2;
+                return CodefendPriority.P2;
         }
     }
 
@@ -40,7 +40,7 @@ public final class BundlerAudit extends Codefend {
         String solution = "";
         String gemName = "";
         String gemVersion = "";
-        int priority = 3;
+        CodefendPriority priority = CodefendPriority.P3;
         String[] split = gemVulnerabilityContent.split("Solution: ");
         if (split.length == 2) {
             solution = split[1].replace("\n", " ").trim();
@@ -154,7 +154,7 @@ public final class BundlerAudit extends Codefend {
     }
 
     @Override
-    public void scan() throws Exception {
+    protected void scan() throws Exception {
         bundlerAuditOutput.delete();
         updateBundlerAuditDatabase();
         runBundlerAudit();

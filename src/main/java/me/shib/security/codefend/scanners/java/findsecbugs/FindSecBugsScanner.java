@@ -382,17 +382,17 @@ public final class FindSecBugsScanner extends Codefend {
     private void warningsToVulns(List<FindSecBugsWarning> warnings) {
         for (FindSecBugsWarning warning : warnings) {
             String title = "FindSecBugs (" + warning.getBugType() + ") found in " + warning.getFilePath() + config.getGitRepo();
-            CodefendFinding vulnerability = newVulnerability(title, warning.getSeverity());
+            CodefendFinding finding = newVulnerability(title, CodefendPriority.valueOf("P" + warning.getSeverity()));
             String message = "The following insecure code was found **[was found](" +
                     config.getGitRepo().getGitRepoWebURL() +
                     "/tree/" + config.getGitRepo().getGitRepoCommitHash() + ")";
-            vulnerability.setField("Message", message);
-            vulnerability.setField("Line", warning.getLineNumber());
-            vulnerability.setField("Type", warning.getBugType());
-            vulnerability.setField("Message", warning.getMessage());
-            vulnerability.setField("Confidence", warning.getPriority());
-            addKeys(vulnerability, warning);
-            vulnerability.update();
+            finding.setField("Message", message);
+            finding.setField("Line", warning.getLineNumber());
+            finding.setField("Type", warning.getBugType());
+            finding.setField("Message", warning.getMessage());
+            finding.setField("Confidence", warning.getPriority());
+            addKeys(finding, warning);
+            finding.update();
         }
     }
 
@@ -460,7 +460,7 @@ public final class FindSecBugsScanner extends Codefend {
     }
 
     @Override
-    public void scan() throws Exception {
+    protected void scan() throws Exception {
 
         int buildType;
         if (new File(config.getScanDirPath() + File.separator + "pom.xml").exists())

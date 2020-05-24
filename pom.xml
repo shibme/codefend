@@ -147,6 +147,11 @@
             <artifactId>commons-codec</artifactId>
             <version>1.14</version>
         </dependency>
+        <dependency>
+            <groupId>me.shib.lib</groupId>
+            <artifactId>steward</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
 </project>

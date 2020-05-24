@@ -42,18 +42,18 @@ public final class DependencyCheck extends Codefend {
         return Context.SCA;
     }
 
-    private int getPriorityForSeverity(String severity) {
+    private CodefendPriority getPriorityForSeverity(String severity) {
         switch (severity.toUpperCase()) {
             case "CRITICAL":
-                return 1;
+                return CodefendPriority.P0;
             case "HIGH":
-                return 2;
+                return CodefendPriority.P1;
             case "MEDIUM":
-                return 3;
+                return CodefendPriority.P2;
             case "LOW":
-                return 4;
+                return CodefendPriority.P3;
             default:
-                return 3;
+                return CodefendPriority.P4;
         }
     }
 
@@ -105,10 +105,10 @@ public final class DependencyCheck extends Codefend {
                 String cve = vulnerability.getName();
                 String title = "Vulnerability (" + cve + ") found in " + dependency.getName() +
                         " of " + config.getGitRepo();
-                int priority = 10;
+                CodefendPriority priority = CodefendPriority.P4;
                 for (VulnDependencyPair vulnDependencyPair : vulnDependencyPairs) {
-                    int vulnPriority = getPriorityForSeverity(vulnDependencyPair.vulnerability.getSeverity());
-                    if (vulnPriority < priority) {
+                    CodefendPriority vulnPriority = getPriorityForSeverity(vulnDependencyPair.vulnerability.getSeverity());
+                    if (vulnPriority.getRank() < priority.getRank()) {
                         priority = vulnPriority;
                     }
                 }
@@ -185,7 +185,7 @@ public final class DependencyCheck extends Codefend {
     }
 
     @Override
-    public void scan() throws IOException, InterruptedException, CodefendException {
+    protected void scan() throws IOException, InterruptedException, CodefendException {
         dependencyCheckReportFile.delete();
         runDependecyCheck();
         DependencyCheckResult dependencyCheckResult = DependencyCheckResult.getResult(dependencyCheckReportFile);

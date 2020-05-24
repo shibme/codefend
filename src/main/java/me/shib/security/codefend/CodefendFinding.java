@@ -1,9 +1,5 @@
 package me.shib.security.codefend;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
 
 public final class CodefendFinding {
@@ -12,35 +8,22 @@ public final class CodefendFinding {
     private final transient CodefendResult result;
 
     private final String title;
-    private final int priority;
+    private final CodefendPriority priority;
     private final Map<String, String> fields;
     private final Set<String> keys;
     private final Set<String> tags;
 
-    CodefendFinding(CodefendResult result, String title, int priority) {
+    CodefendFinding(CodefendResult result, String title, CodefendPriority priority) {
         this.result = result;
         this.title = title;
         this.priority = priority;
-        this.fields = new HashMap<>();
+        this.fields = new LinkedHashMap<>();
         this.keys = new HashSet<>();
         this.tags = new HashSet<>();
     }
 
     public void update() {
         result.updateVulnerability(this);
-    }
-
-    private List<String> readLinesFromFile(File file) throws IOException {
-        List<String> lines = new ArrayList<>();
-        if (file.exists() && !file.isDirectory()) {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-            br.close();
-        }
-        return lines;
     }
 
     public void addKey(String key) throws CodefendException {
@@ -58,7 +41,7 @@ public final class CodefendFinding {
         return this.title;
     }
 
-    public int getPriority() {
+    public CodefendPriority getPriority() {
         return priority;
     }
 
@@ -95,6 +78,26 @@ public final class CodefendFinding {
 
     public Set<String> getTags() {
         return this.tags;
+    }
+
+    public String getProject() {
+        return result.getProject();
+    }
+
+    public Lang getLang() {
+        return result.getLang();
+    }
+
+    public Codefend.Context getContext() {
+        return result.getContext();
+    }
+
+    public String getScanner() {
+        return result.getScanner();
+    }
+
+    public String getScanDirPath() {
+        return result.getScanDirPath();
     }
 
     @Override

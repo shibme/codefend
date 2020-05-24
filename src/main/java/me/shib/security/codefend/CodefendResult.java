@@ -20,7 +20,7 @@ final class CodefendResult {
         this.vulnerabilityMap = new HashMap<>();
     }
 
-    CodefendFinding newVulnerability(String title, int priority) {
+    CodefendFinding newVulnerability(String title, CodefendPriority priority) {
         return new CodefendFinding(this, title, priority);
     }
 

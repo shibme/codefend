@@ -40,7 +40,7 @@ public final class BrakemanScanner extends Codefend {
     }
 
     @Override
-    public void scan() throws CodefendException, IOException, InterruptedException {
+    protected void scan() throws CodefendException, IOException, InterruptedException {
         brakemanOutput.delete();
         runBrakeman();
         processBrakemanResult();
@@ -57,7 +57,7 @@ public final class BrakemanScanner extends Codefend {
 
     private void warningToVulnerability(BrakemanWarning warning) throws CodefendException {
         String title = "Brakeman warning (" + warning.getWarning_type() + ") found in " + warning.getFile();
-        int priority = BrakemanPriorityCalculator.getCodefendPriority(warning.getWarning_type(), warning.getConfidence());
+        CodefendPriority priority = BrakemanPriorityCalculator.getCodefendPriority(warning.getWarning_type(), warning.getConfidence());
         CodefendFinding vulnerability = newVulnerability(title, priority);
         if (warning.getLink() != null) {
             vulnerability.setField("Type", "[" + warning.getWarning_type() + "](" + warning.getLink() + ")");

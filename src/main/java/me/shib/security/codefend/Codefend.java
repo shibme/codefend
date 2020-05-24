@@ -130,7 +130,7 @@ public abstract class Codefend {
         return null;
     }
 
-    protected CodefendFinding newVulnerability(String title, int priority) {
+    protected CodefendFinding newVulnerability(String title, CodefendPriority priority) {
         return result.newVulnerability(title, priority);
     }
 
@@ -173,7 +173,7 @@ public abstract class Codefend {
         return result.getScanDirPath();
     }
 
-    public List<CodefendFinding> getVulnerabilities() {
+    public List<CodefendFinding> getFindings() {
         return result.getVulnerabilities();
     }
 
@@ -183,7 +183,7 @@ public abstract class Codefend {
 
     public abstract Context getContext();
 
-    public abstract void scan() throws Exception;
+    protected abstract void scan() throws Exception;
 
     public enum Context {
         SAST, SCA
