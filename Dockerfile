@@ -1,6 +1,6 @@
-FROM shibme/codefender-base
+FROM shibme/codefend-base
 LABEL maintainer="shibme"
-RUN mkdir /codefender-bin
-ADD target/codefender-jar-with-dependencies.jar /codefender-bin/run-codefender.jar
+RUN mkdir /codefend-bin
+ADD target/codefend-jar-with-dependencies.jar /codefend-bin/run-codefend.jar
 WORKDIR /workspace
-CMD ["java","-jar","/codefender-bin/run-codefender.jar"]
+CMD ["java","-jar","/codefend-bin/run-codefend.jar"]
