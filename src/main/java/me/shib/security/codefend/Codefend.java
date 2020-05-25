@@ -186,7 +186,18 @@ public abstract class Codefend {
     protected abstract void scan() throws Exception;
 
     public enum Context {
-        SAST, SCA
+        SAST("Codefend-SAST"),
+        SCA("Codefend-SCA");
+
+        private final String label;
+
+        Context(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 
 }

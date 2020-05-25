@@ -31,7 +31,7 @@ final class StewardAdapter {
         StewardFinding sf = new StewardFinding(finding.getTitle(), toStewardPriority(finding.getPriority()));
         sf.addContext(finding.getProject());
         sf.addContext(finding.getLang().name());
-        sf.addContext(finding.getContext().name());
+        sf.addContext(finding.getContext().getLabel());
         sf.addContexts(finding.getKeys());
         sf.addTags(finding.getTags());
         StringBuilder description = new StringBuilder();

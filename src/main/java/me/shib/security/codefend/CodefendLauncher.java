@@ -1,7 +1,5 @@
 package me.shib.security.codefend;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.shib.steward.Steward;
 import me.shib.steward.StewardConfig;
 import me.shib.steward.StewardData;
@@ -10,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class CodefendLauncher {
-
-    private static final transient Gson gson = new GsonBuilder().setPrettyPrinting()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
 
     private static void processResults(CodefendConfig config, List<Codefend> codefends) {
         try {

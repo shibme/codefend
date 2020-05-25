@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-if [ -z "$CODEFEND_IMAGE" ]; then
-  export CODEFEND_IMAGE="shibme/codefend"
-fi
 DOCKER_VERSION_RESPONSE=$(docker -v)
 EXPECTED_RESPONSE="Docker version "
 if test "${DOCKER_VERSION_RESPONSE#*$EXPECTED_RESPONSE}" != "$DOCKER_VERSION_RESPONSE"; then
@@ -12,7 +9,8 @@ if test "${DOCKER_VERSION_RESPONSE#*$EXPECTED_RESPONSE}" != "$DOCKER_VERSION_RES
     CODEFEND_CONTAINER="codefend"
   fi
   CODEFEND_CONTAINER=${CODEFEND_CONTAINER// /_}
-  if [ -z "$1" ]; then
+  if [ -z "$CODEFEND_IMAGE" ]; then
+    export CODEFEND_IMAGE="shibme/codefend"
     docker pull "$CODEFEND_IMAGE"
   fi
 
