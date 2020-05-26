@@ -34,12 +34,7 @@ final class StewardAdapter {
         sf.addContext(finding.getContext().getLabel());
         sf.addContexts(finding.getKeys());
         sf.addTags(finding.getTags());
-        StringBuilder description = new StringBuilder();
-        for (String key : finding.getFields().keySet()) {
-            description.append(" * **").append(key).append(":** ")
-                    .append(finding.getFields().get(key)).append("\n");
-        }
-        sf.setDescription(description.toString());
+        sf.setDescription(finding.getDescription());
         return sf;
     }
 

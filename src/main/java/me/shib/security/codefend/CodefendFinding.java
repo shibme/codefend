@@ -12,6 +12,7 @@ public final class CodefendFinding {
     private final Map<String, String> fields;
     private final Set<String> keys;
     private final Set<String> tags;
+    private String description;
 
     CodefendFinding(CodefendResult result, String title, CodefendPriority priority) {
         this.result = result;
@@ -78,6 +79,22 @@ public final class CodefendFinding {
 
     public Set<String> getTags() {
         return this.tags;
+    }
+
+    public String getDescription() {
+        if (description == null) {
+            StringBuilder content = new StringBuilder();
+            for (String key : fields.keySet()) {
+                content.append(" * **").append(key).append(":** ")
+                        .append(fields.get(key)).append("\n");
+            }
+            return content.toString();
+        }
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getProject() {
