@@ -47,40 +47,63 @@ public final class BrakemanScanner extends Codefend {
     }
 
     private void runBrakeman() throws CodefendException, IOException, InterruptedException {
-        StringBuilder brakemanCommandBuilder = new StringBuilder();
-        brakemanCommandBuilder.append("brakeman -o ").append(brakemanOutput.getAbsolutePath());
-        String response = runCommand(brakemanCommandBuilder.toString());
+        String response = runCommand("brakeman -o " + brakemanOutput.getAbsolutePath());
         if (response.contains("command not found") || response.contains("is currently not installed")) {
             throw new CodefendException("Install brakeman before proceeding");
         }
     }
 
-    private void warningToVulnerability(BrakemanWarning warning) throws CodefendException {
+    private String getDescription(BrakemanWarning warning) {
+        StringBuilder description = new StringBuilder();
+        description.append("The following insecure code warnings were found in ").append("**[")
+                .append(warning.getFile()).append("](").append(getConfig().getGitRepo().getGitRepoWebURL()).append("/tree/")
+                .append(getConfig().getGitRepo().getGitRepoCommitHash()).append("/").append(warning.getFile()).append("):**\n");
+        description.append(" * **Line:** ").append(warning.getLine()).append("\n");
+        description.append(" * **Type:** ");
+        if (warning.getLink() != null) {
+            description.append("[").append(warning.getWarning_type()).append("](").append(warning.getLink()).append(")");
+        } else {
+            description.append(warning.getWarning_type());
+        }
+        description.append("\n");
+        description.append(" * **Message:** ").append(warning.getMessage()).append("\n");
+        description.append(" * **Confidence:** ").append(warning.getConfidence());
+        if (warning.getCode() != null) {
+            description.append("\n * **Code:**\n");
+            description.append("```\n");
+            description.append(warning.getCode());
+            description.append("\n```");
+        }
+        return description.toString();
+    }
+
+    private void warningToFinding(BrakemanWarning warning) throws CodefendException {
         String title = "Brakeman warning (" + warning.getWarning_type() + ") found in " + warning.getFile();
         CodefendPriority priority = BrakemanPriorityCalculator.getCodefendPriority(warning.getWarning_type(), warning.getConfidence());
-        CodefendFinding vulnerability = newVulnerability(title, priority);
+        CodefendFinding finding = newVulnerability(title, priority);
         if (warning.getLink() != null) {
-            vulnerability.setField("Type", "[" + warning.getWarning_type() + "](" + warning.getLink() + ")");
+            finding.setField("Type", "[" + warning.getWarning_type() + "](" + warning.getLink() + ")");
         } else {
-            vulnerability.setField("Type", warning.getWarning_type());
+            finding.setField("Type", warning.getWarning_type());
         }
-        vulnerability.setField("File", warning.getFile());
-        vulnerability.setField("Line", warning.getLine() + "");
-        vulnerability.setField("Message", warning.getMessage());
-        vulnerability.setField("Confidence", warning.getConfidence());
+        finding.setField("File", warning.getFile());
+        finding.setField("Line", warning.getLine() + "");
+        finding.setField("Message", warning.getMessage());
+        finding.setField("Confidence", warning.getConfidence());
         if (warning.getCode() != null) {
-            vulnerability.setField("Code", "```\n" + warning.getCode() + "\n```");
+            finding.setField("Code", "```\n" + warning.getCode() + "\n```");
         }
-        vulnerability.addKey(warning.getFile());
-        vulnerability.addKey("Brakeman-" + warning.getFingerprint());
-        vulnerability.update();
+        finding.addKey(warning.getFile());
+        finding.addKey("Brakeman-" + warning.getFingerprint());
+        finding.setDescription(getDescription(warning));
+        finding.update();
     }
 
     private void processBrakemanResult() throws IOException, CodefendException {
         BrakemanResult brakemanResult = BrakemanResult.getBrakemanResult(brakemanOutput);
         for (BrakemanWarning warning : brakemanResult.getWarnings()) {
             if (!isExcludedPath(warning.getFile())) {
-                warningToVulnerability(warning);
+                warningToFinding(warning);
             }
         }
     }

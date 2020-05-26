@@ -33,6 +33,30 @@ public final class BundlerAudit extends Codefend {
         }
     }
 
+    private String getDescription(String gemName, String gemVersion, String descriptionTitle, String url, String solution, String advisory) {
+        StringBuilder description = new StringBuilder();
+        description.append("A vulnerable gem (**").append(gemName)
+                .append("-").append(gemVersion)
+                .append("**) was found to be used in the repository ");
+        description.append("**[").append(getConfig().getGitRepo()).append("](")
+                .append(getConfig().getGitRepo().getGitRepoWebURL()).append(")**.\n");
+        try {
+            description.append("\n**[").append(advisory).append("](").append(getUrlForCVE(advisory)).append("):**");
+        } catch (CodefendException e) {
+            description.append("\n**[").append(advisory).append("](").append(url).append("):**");
+        }
+        if (descriptionTitle != null && !descriptionTitle.isEmpty()) {
+            description.append("\n * **Description:** ").append(descriptionTitle);
+        }
+        if (url != null && !url.isEmpty()) {
+            description.append("\n * **Reference:** [").append(url).append("]");
+        }
+        if (solution != null && !solution.isEmpty()) {
+            description.append("\n * **Solution:** ").append(solution);
+        }
+        return description.toString();
+    }
+
     private void addBugForContent(String gemVulnerabilityContent) throws CodefendException {
         String advisory = "";
         String url = "";
@@ -70,23 +94,24 @@ public final class BundlerAudit extends Codefend {
             gemName = split[1].replace("\n", " ").trim();
         }
         String title = "Vulnerable Gem (" + advisory + ") - " + gemName;
-        CodefendFinding vulnerability = newVulnerability(title, priority);
-        vulnerability.setField("Description", descriptionTitle);
-        vulnerability.setField("Gem Name", gemName);
-        vulnerability.setField("Gem Version", gemVersion);
+        CodefendFinding finding = newVulnerability(title, priority);
+        finding.setField("Description", descriptionTitle);
+        finding.setField("Gem Name", gemName);
+        finding.setField("Gem Version", gemVersion);
         if (advisory.startsWith("CVE-")) {
-            vulnerability.setCVE(advisory);
+            finding.setCVE(advisory);
         } else {
-            vulnerability.setField("Advisory", advisory);
+            finding.setField("Advisory", advisory);
         }
-        vulnerability.setField("Solution", solution);
-        vulnerability.setField("Reference", url);
+        finding.setField("Solution", solution);
+        finding.setField("Reference", url);
         if (gemName.isEmpty() || advisory.isEmpty()) {
             return;
         }
-        vulnerability.addKey(gemName);
-        vulnerability.addKey(advisory);
-        vulnerability.update();
+        finding.addKey(gemName);
+        finding.addKey(advisory);
+        finding.setDescription(getDescription(gemName, gemVersion, descriptionTitle, url, solution, advisory));
+        finding.update();
     }
 
     private void parseOutputContentToResult(String content) throws CodefendException {

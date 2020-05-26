@@ -56,80 +56,108 @@ public final class RetirejsScanner extends Codefend {
                 if (data.getResults() != null) {
                     for (RetirejsResult.Data.Result result : data.getResults()) {
                         if (result.getVulnerabilities() != null) {
-                            for (RetirejsResult.Data.Result.Vulnerability retireVuln : result.getVulnerabilities()) {
+                            for (RetirejsResult.Data.Result.Vulnerability vulnerability : result.getVulnerabilities()) {
                                 StringBuilder title = new StringBuilder();
-                                if (retireVuln.getBelow() != null) {
+                                if (vulnerability.getBelow() != null) {
                                     title.append("Vulnerability found in ").append(result.getComponent())
-                                            .append(" (Below ").append(retireVuln.getBelow()).append(")");
-                                } else if (retireVuln.getAtOrAbove() != null) {
+                                            .append(" (Below ").append(vulnerability.getBelow()).append(")");
+                                } else if (vulnerability.getAtOrAbove() != null) {
                                     title.append("Vulnerability found in ").append(result.getComponent())
-                                            .append(" (At/Above ").append(retireVuln.getAtOrAbove())
+                                            .append(" (At/Above ").append(vulnerability.getAtOrAbove())
                                             .append(")");
                                 } else {
                                     title.append("Vulnerability found in ").append(result.getComponent());
                                 }
-                                CodefendFinding vulnerability = newVulnerability(title.toString(),
-                                        getPriorityForSeverity(retireVuln.getSeverity()));
-                                vulnerability.setField("Build File Path", data.getFile());
-                                vulnerability.setField("Component", result.getComponent());
-                                vulnerability.setField("Version:", result.getVersion());
-                                if (retireVuln.getAtOrAbove() != null) {
-                                    vulnerability.setField("Severity", retireVuln.getSeverity());
+                                CodefendFinding finding = newVulnerability(title.toString(),
+                                        getPriorityForSeverity(vulnerability.getSeverity()));
+                                StringBuilder description = new StringBuilder();
+                                description.append("A known vulnerability in **")
+                                        .append(result.getComponent()).append("** exists in ").append("**[")
+                                        .append(getConfig().getGitRepo()).append("](")
+                                        .append(getConfig().getGitRepo().getGitRepoWebURL()).append(")**.\n");
+                                description.append(" * **Build File Path:** ").append(data.getFile()).append("\n");
+                                finding.setField("Build File Path", data.getFile());
+                                description.append(" * **Component:** ").append(result.getComponent()).append("\n");
+                                finding.setField("Component", result.getComponent());
+                                description.append(" * **Version:** ").append(result.getVersion()).append("\n");
+                                finding.setField("Version:", result.getVersion());
+                                if (vulnerability.getAtOrAbove() != null) {
+                                    description.append(" * **Severity:** ").append(vulnerability.getSeverity()).append("\n");
+                                    finding.setField("Severity", vulnerability.getSeverity());
                                 }
-                                if (retireVuln.getBelow() != null) {
-                                    vulnerability.addKey("Below-" + retireVuln.getBelow());
-                                    vulnerability.setField("Below", retireVuln.getBelow());
+                                if (vulnerability.getBelow() != null) {
+                                    finding.addKey("Below-" + vulnerability.getBelow());
+                                    description.append(" * **Below:** ").append(vulnerability.getBelow()).append("\n");
+                                    finding.setField("Below", vulnerability.getBelow());
                                 }
-                                if (retireVuln.getAtOrAbove() != null) {
-                                    vulnerability.addKey("AtOrAbove-" + retireVuln.getAtOrAbove());
-                                    vulnerability.setField("At (or) Above", retireVuln.getAtOrAbove());
+                                if (vulnerability.getAtOrAbove() != null) {
+                                    finding.addKey("AtOrAbove-" + vulnerability.getAtOrAbove());
+                                    description.append(" * **At (or) Above:** ").append(vulnerability.getAtOrAbove()).append("\n");
+                                    finding.setField("At (or) Above", vulnerability.getAtOrAbove());
                                 }
                                 List<String> ignorableInfo = new ArrayList<>();
-                                if (retireVuln.getIdentifiers() != null) {
-                                    if (retireVuln.getIdentifiers().getIssue() != null) {
-                                        vulnerability.addKey("JS-Issue-" + retireVuln.getIdentifiers().getIssue());
+                                if (vulnerability.getIdentifiers() != null) {
+                                    if (vulnerability.getIdentifiers().getIssue() != null) {
+                                        finding.addKey("JS-Issue-" + vulnerability.getIdentifiers().getIssue());
                                         String issueURL = null;
-                                        for (String info : retireVuln.getInfo()) {
-                                            if (info.contains(retireVuln.getIdentifiers().getIssue()) &&
+                                        for (String info : vulnerability.getInfo()) {
+                                            if (info.contains(vulnerability.getIdentifiers().getIssue()) &&
                                                     info.toLowerCase().startsWith("http")) {
                                                 issueURL = info;
                                                 ignorableInfo.add(issueURL);
                                             }
                                         }
+                                        description.append(" * **Issue Reference:** ");
                                         if (null == issueURL) {
-                                            vulnerability.setField("Issue Reference",
-                                                    retireVuln.getIdentifiers().getIssue());
+                                            description.append(vulnerability.getIdentifiers().getIssue());
+                                            finding.setField("Issue Reference",
+                                                    vulnerability.getIdentifiers().getIssue());
                                         } else {
-                                            vulnerability.setField("Issue Reference", "[" +
-                                                    retireVuln.getIdentifiers().getIssue() + "](" + issueURL + ")");
+                                            description.append("[").append(vulnerability.getIdentifiers().getIssue()).append("](")
+                                                    .append(issueURL).append(")");
+                                            finding.setField("Issue Reference", "[" +
+                                                    vulnerability.getIdentifiers().getIssue() + "](" + issueURL + ")");
                                         }
                                     }
-                                    if (retireVuln.getIdentifiers().getBug() != null) {
-                                        vulnerability.addKey("JS-Bug-" + retireVuln.getIdentifiers().getBug());
+                                    description.append("\n");
+                                    if (vulnerability.getIdentifiers().getBug() != null) {
+                                        finding.addKey("JS-Bug-" + vulnerability.getIdentifiers().getBug());
                                         String bugURL = null;
-                                        for (String info : retireVuln.getInfo()) {
-                                            if (info.contains(retireVuln.getIdentifiers().getBug()) && info.toLowerCase().startsWith("http")) {
+                                        for (String info : vulnerability.getInfo()) {
+                                            if (info.contains(vulnerability.getIdentifiers().getBug()) && info.toLowerCase().startsWith("http")) {
                                                 bugURL = info;
                                                 ignorableInfo.add(bugURL);
                                             }
                                         }
+                                        description.append(" * **Bug Reference:** ");
                                         if (null == bugURL) {
-                                            vulnerability.setField("Bug Reference",
-                                                    retireVuln.getIdentifiers().getBug());
+                                            description.append(vulnerability.getIdentifiers().getBug());
+                                            finding.setField("Bug Reference",
+                                                    vulnerability.getIdentifiers().getBug());
                                         } else {
-                                            vulnerability.setField("Bug Reference", "[" +
-                                                    retireVuln.getIdentifiers().getBug() + "](" + bugURL + ")");
+                                            description.append("[").append(vulnerability.getIdentifiers().getBug()).append("](")
+                                                    .append(bugURL).append(")");
+                                            finding.setField("Bug Reference", "[" +
+                                                    vulnerability.getIdentifiers().getBug() + "](" + bugURL + ")");
                                         }
+                                        description.append("\n");
                                     }
-                                    if (retireVuln.getIdentifiers().getCVE() != null
-                                            && retireVuln.getIdentifiers().getCVE().size() > 0) {
-                                        for (String cve : retireVuln.getIdentifiers().getCVE()) {
-                                            vulnerability.addKey(cve);
+                                    if (vulnerability.getIdentifiers().getCVE() != null
+                                            && vulnerability.getIdentifiers().getCVE().size() > 0) {
+                                        description.append(" * **CVE:**");
+                                        for (String cve : vulnerability.getIdentifiers().getCVE()) {
+                                            finding.addKey(cve);
+                                            try {
+                                                description.append(" ").append("[").append(cve).append("](").append(getUrlForCVE(cve)).append(")");
+                                            } catch (CodefendException e) {
+                                                description.append(" ").append(cve);
+                                            }
                                         }
-                                        vulnerability.setCVEs(retireVuln.getIdentifiers().getCVE());
+                                        description.append("\n");
+                                        finding.setCVEs(vulnerability.getIdentifiers().getCVE());
                                     }
                                 }
-                                Set<String> filteredReferences = new HashSet<>(retireVuln.getInfo());
+                                Set<String> filteredReferences = new HashSet<>(vulnerability.getInfo());
                                 for (String ignoreableRef : ignorableInfo) {
                                     filteredReferences.remove(ignoreableRef);
                                 }
@@ -142,12 +170,14 @@ public final class RetirejsScanner extends Codefend {
                                             referenceContent.append(" * ").append(filteredRef).append("\n");
                                         }
                                     }
-                                    vulnerability.setField("More references", referenceContent.toString().trim());
+                                    description.append("\n**More references:**\n").append(referenceContent);
+                                    finding.setField("More references", referenceContent.toString().trim());
                                 }
-                                vulnerability.addKey(data.getFile());
-                                vulnerability.addKey(result.getComponent());
-                                vulnerability.addKey(result.getComponent() + "-" + result.getVersion());
-                                vulnerability.update();
+                                finding.setDescription(description.toString());
+                                finding.addKey(data.getFile());
+                                finding.addKey(result.getComponent());
+                                finding.addKey(result.getComponent() + "-" + result.getVersion());
+                                finding.update();
                             }
                         }
                     }

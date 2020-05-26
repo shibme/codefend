@@ -16,6 +16,7 @@ import java.util.Set;
 
 public abstract class Codefend {
 
+    private static final transient String cveBaseURL = "https://nvd.nist.gov/vuln/detail/";
     private static final transient Gson gson = new GsonBuilder().setPrettyPrinting()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
     private static final transient Set<Codefend> codefends = new HashSet<>();
@@ -94,6 +95,13 @@ public abstract class Codefend {
         pw.close();
     }
 
+    protected String getUrlForCVE(String cve) throws CodefendException {
+        if (cve != null && cve.toUpperCase().startsWith("CVE")) {
+            return cveBaseURL + cve;
+        }
+        throw new CodefendException("CVE provided is not valid");
+    }
+
     protected String getHash(File file, int lineNo, String type, String[] args) throws IOException {
         return getHash(file, lineNo, lineNo, type, args);
     }
@@ -159,6 +167,10 @@ public abstract class Codefend {
             content.append(line).append("\n");
         }
         return content.toString();
+    }
+
+    protected CodefendConfig getConfig() {
+        return config;
     }
 
     public String getProject() {
