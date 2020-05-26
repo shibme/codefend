@@ -2,19 +2,19 @@ package me.shib.security.codefend;
 
 import java.util.*;
 
-public final class CodefendFinding {
+public final class CodeFendFinding {
 
     private static final transient String cveBaseURL = "https://nvd.nist.gov/vuln/detail/";
-    private final transient CodefendResult result;
+    private final transient CodeFendResult result;
 
     private final String title;
-    private final CodefendPriority priority;
+    private final CodeFendPriority priority;
     private final Map<String, String> fields;
     private final Set<String> keys;
     private final Set<String> tags;
     private String description;
 
-    CodefendFinding(CodefendResult result, String title, CodefendPriority priority) {
+    CodeFendFinding(CodeFendResult result, String title, CodeFendPriority priority) {
         this.result = result;
         this.title = title;
         this.priority = priority;
@@ -27,9 +27,9 @@ public final class CodefendFinding {
         result.updateVulnerability(this);
     }
 
-    public void addKey(String key) throws CodefendException {
+    public void addKey(String key) throws CodeFendException {
         if (key == null || key.isEmpty()) {
-            throw new CodefendException("Null or Empty key cannot be processed");
+            throw new CodeFendException("Null or Empty key cannot be processed");
         }
         this.keys.add(key);
     }
@@ -42,7 +42,7 @@ public final class CodefendFinding {
         return this.title;
     }
 
-    public CodefendPriority getPriority() {
+    public CodeFendPriority getPriority() {
         return priority;
     }
 
@@ -105,7 +105,7 @@ public final class CodefendFinding {
         return result.getLang();
     }
 
-    public Codefend.Context getContext() {
+    public CodeFend.Context getContext() {
         return result.getContext();
     }
 

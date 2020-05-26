@@ -7,29 +7,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class BundlerAudit extends Codefend {
+public final class BundlerAudit extends CodeFend {
 
     private static transient final String tool = "BundlerAudit";
     private static transient final File bundlerAuditOutput = new File("bundleraudit-result.txt");
 
-    public BundlerAudit(CodefendConfig config) {
+    public BundlerAudit(CodeFendConfig config) {
         super(config);
     }
 
-    private static CodefendPriority getPriorityNumberForName(String priorityName) {
+    private static CodeFendPriority getPriorityNumberForName(String priorityName) {
         switch (priorityName) {
             case "Urgent":
-                return CodefendPriority.P0;
+                return CodeFendPriority.P0;
             case "Critical":
-                return CodefendPriority.P0;
+                return CodeFendPriority.P0;
             case "High":
-                return CodefendPriority.P1;
+                return CodeFendPriority.P1;
             case "Medium":
-                return CodefendPriority.P2;
+                return CodeFendPriority.P2;
             case "Low":
-                return CodefendPriority.P3;
+                return CodeFendPriority.P3;
             default:
-                return CodefendPriority.P2;
+                return CodeFendPriority.P2;
         }
     }
 
@@ -42,7 +42,7 @@ public final class BundlerAudit extends Codefend {
                 .append(getConfig().getGitRepo().getGitRepoWebURL()).append(")**.\n");
         try {
             description.append("\n**[").append(advisory).append("](").append(getUrlForCVE(advisory)).append("):**");
-        } catch (CodefendException e) {
+        } catch (CodeFendException e) {
             description.append("\n**[").append(advisory).append("](").append(url).append("):**");
         }
         if (descriptionTitle != null && !descriptionTitle.isEmpty()) {
@@ -57,14 +57,14 @@ public final class BundlerAudit extends Codefend {
         return description.toString();
     }
 
-    private void addBugForContent(String gemVulnerabilityContent) throws CodefendException {
+    private void addBugForContent(String gemVulnerabilityContent) throws CodeFendException {
         String advisory = "";
         String url = "";
         String descriptionTitle = "";
         String solution = "";
         String gemName = "";
         String gemVersion = "";
-        CodefendPriority priority = CodefendPriority.P3;
+        CodeFendPriority priority = CodeFendPriority.P3;
         String[] split = gemVulnerabilityContent.split("Solution: ");
         if (split.length == 2) {
             solution = split[1].replace("\n", " ").trim();
@@ -93,8 +93,9 @@ public final class BundlerAudit extends Codefend {
         if (split.length == 2) {
             gemName = split[1].replace("\n", " ").trim();
         }
-        String title = "Vulnerable Gem (" + advisory + ") - " + gemName;
-        CodefendFinding finding = newVulnerability(title, priority);
+        String title = "Vulnerable Gem (" + advisory + ") - " + gemName +
+                " in project - " + getConfig().getProject();
+        CodeFendFinding finding = newVulnerability(title, priority);
         finding.setField("Description", descriptionTitle);
         finding.setField("Gem Name", gemName);
         finding.setField("Gem Version", gemVersion);
@@ -114,7 +115,7 @@ public final class BundlerAudit extends Codefend {
         finding.update();
     }
 
-    private void parseOutputContentToResult(String content) throws CodefendException {
+    private void parseOutputContentToResult(String content) throws CodeFendException {
         String[] lines = content.split("\n");
         String lastLine = lines[lines.length - 1];
         if (lastLine.equalsIgnoreCase("Vulnerabilities found!")) {
@@ -136,29 +137,29 @@ public final class BundlerAudit extends Codefend {
                 i++;
             }
         } else if (!lastLine.equalsIgnoreCase("No vulnerabilities found")) {
-            throw new CodefendException("Something went wrong with Bundler Audit");
+            throw new CodeFendException("Something went wrong with Bundler Audit");
         }
     }
 
-    private String bundlerAuditExecutor(String command) throws CodefendException, IOException, InterruptedException {
+    private String bundlerAuditExecutor(String command) throws CodeFendException, IOException, InterruptedException {
         String response = runCommand(command);
         if (response.contains("command not found") || response.contains("is currently not installed")) {
-            throw new CodefendException("Install npm before proceeding");
+            throw new CodeFendException("Install npm before proceeding");
         }
         return response;
     }
 
-    private void runBundlerAudit() throws CodefendException, IOException, InterruptedException {
+    private void runBundlerAudit() throws CodeFendException, IOException, InterruptedException {
         System.out.println("Running BundlerAudit...");
         String bundlerAuditResponse = bundlerAuditExecutor("bundle-audit");
         writeToFile(bundlerAuditResponse, bundlerAuditOutput);
     }
 
-    private void updateBundlerAuditDatabase() throws CodefendException, IOException, InterruptedException {
+    private void updateBundlerAuditDatabase() throws CodeFendException, IOException, InterruptedException {
         bundlerAuditExecutor("bundle-audit update");
     }
 
-    private void parseBundlerAuditResult() throws CodefendException, IOException {
+    private void parseBundlerAuditResult() throws CodeFendException, IOException {
         String resultContent = readFromFile(bundlerAuditOutput);
         parseOutputContentToResult(resultContent);
     }

@@ -4,7 +4,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public final class CodefendConfig {
+public final class CodeFendConfig {
 
     private static final transient String CODEFEND_PROJECT = "CODEFEND_PROJECT";
     private static final transient String CODEFEND_DIR = "CODEFEND_DIR";
@@ -19,7 +19,7 @@ public final class CodefendConfig {
     private static final transient String CODEFEND_GIT_TOKEN = "CODEFEND_GIT_TOKEN";
     private static final transient String CODEFEND_GIT_SSHKEY = "CODEFEND_GIT_SSHKEY";
 
-    private static transient CodefendConfig config;
+    private static transient CodeFendConfig config;
 
     private transient File scanDir;
     private transient GitRepo gitRepo;
@@ -28,12 +28,12 @@ public final class CodefendConfig {
     private String scanDirPath;
     private String buildScript;
     private Lang lang;
-    private Codefend.Context context;
+    private CodeFend.Context context;
     private String tool;
     private GitCredential gitCredential;
 
-    public CodefendConfig(String project, String scanDirPath, String buildScript, Lang lang,
-                          Codefend.Context context, String tool, GitRepo gitRepo, GitCredential gitCredential) {
+    public CodeFendConfig(String project, String scanDirPath, String buildScript, Lang lang,
+                          CodeFend.Context context, String tool, GitRepo gitRepo, GitCredential gitCredential) {
         this.project = project;
         this.scanDirPath = scanDirPath;
         this.buildScript = buildScript;
@@ -45,13 +45,13 @@ public final class CodefendConfig {
         init();
     }
 
-    private CodefendConfig() {
+    private CodeFendConfig() {
         init();
     }
 
-    static synchronized CodefendConfig getInstance() {
+    static synchronized CodeFendConfig getInstance() {
         if (config == null) {
-            config = new CodefendConfig();
+            config = new CodeFendConfig();
         }
         return config;
     }
@@ -74,9 +74,9 @@ public final class CodefendConfig {
         return null;
     }
 
-    private Codefend.Context buildContextFromEnv() {
+    private CodeFend.Context buildContextFromEnv() {
         try {
-            return Codefend.Context.valueOf(envValue(CODEFEND_CONTEXT));
+            return CodeFend.Context.valueOf(envValue(CODEFEND_CONTEXT));
         } catch (Exception e) {
             return null;
         }
@@ -106,7 +106,7 @@ public final class CodefendConfig {
         return lang;
     }
 
-    public Codefend.Context getContext() {
+    public CodeFend.Context getContext() {
         return context;
     }
 
@@ -140,7 +140,7 @@ public final class CodefendConfig {
                 if (gitRepo != null) {
                     project = gitRepo.getGitRepoSlug();
                 } else {
-                    project = "Codefend_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS").format(new Date().getTime());
+                    project = "CodeFend_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS").format(new Date().getTime());
                 }
             }
         }
@@ -166,7 +166,7 @@ public final class CodefendConfig {
         }
     }
 
-    String getProject() {
+    public String getProject() {
         return project;
     }
 

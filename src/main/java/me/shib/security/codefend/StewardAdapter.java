@@ -8,9 +8,9 @@ import java.util.List;
 
 final class StewardAdapter {
 
-    private static final transient String toolName = "Codefend";
+    private static final transient String toolName = "CodeFend";
 
-    private static TrakrPriority toStewardPriority(CodefendPriority priority) {
+    private static TrakrPriority toStewardPriority(CodeFendPriority priority) {
         switch (priority) {
             case P0:
                 return TrakrPriority.P0;
@@ -27,7 +27,7 @@ final class StewardAdapter {
         }
     }
 
-    private static StewardFinding toStewardFinding(CodefendFinding finding) {
+    private static StewardFinding toStewardFinding(CodeFendFinding finding) {
         StewardFinding sf = new StewardFinding(finding.getTitle(), toStewardPriority(finding.getPriority()));
         sf.addContext(finding.getProject());
         sf.addContext(finding.getLang().name());
@@ -38,7 +38,7 @@ final class StewardAdapter {
         return sf;
     }
 
-    static StewardData toStewardData(CodefendConfig config, List<CodefendFinding> findings) {
+    static StewardData toStewardData(CodeFendConfig config, List<CodeFendFinding> findings) {
         StewardData data = new StewardData(config.getProject(), toolName);
         data.addContext(config.getLang().name());
         if (config.getGitRepo() != null) {
@@ -48,7 +48,7 @@ final class StewardAdapter {
             String scanDirContext = "ScanDir-" + config.getScanDirPath();
             data.addContext(scanDirContext);
         }
-        for (CodefendFinding finding : findings) {
+        for (CodeFendFinding finding : findings) {
             data.addFinding(toStewardFinding(finding));
         }
         return data;

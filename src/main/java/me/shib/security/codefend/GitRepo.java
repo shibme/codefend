@@ -19,21 +19,21 @@ public class GitRepo {
         init(gitUri, gitRepoBranch, gitRepoCommitHash);
     }
 
-    GitRepo() throws CodefendException {
+    GitRepo() throws CodeFendException {
         File gitDir = new File(".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            throw new CodefendException("Not a Git Repository");
+            throw new CodeFendException("Not a Git Repository");
         }
         String gitUri = getGitUrlFromLocalRepo();
         if (gitUri == null) {
-            throw new CodefendException("Not a Git Repository");
+            throw new CodeFendException("Not a Git Repository");
         }
         String gitBranch = getGitBranchFromLocalRepo();
         String gitCommit = getGitCommitFromLocalRepo();
         init(gitUri, gitBranch, gitCommit);
     }
 
-    private static String runGitCommand(String gitCommand) throws CodefendException {
+    private static String runGitCommand(String gitCommand) throws CodeFendException {
         CommandRunner runner = new CommandRunner(gitCommand, "Git");
         runner.suppressConsoleLog();
         try {
@@ -44,12 +44,12 @@ public class GitRepo {
         }
         String response = runner.getResult();
         if (response.contains("command not found") || response.contains("is currently not installed")) {
-            throw new CodefendException("Git was not found in local environment before proceeding");
+            throw new CodeFendException("Git was not found in local environment before proceeding");
         }
         return response;
     }
 
-    private static String getGitUrlFromLocalRepo() throws CodefendException {
+    private static String getGitUrlFromLocalRepo() throws CodeFendException {
         String response = runGitCommand("git config --get remote.origin.url");
         if (response != null) {
             return response.trim();
@@ -57,7 +57,7 @@ public class GitRepo {
         return null;
     }
 
-    private static String getGitBranchFromLocalRepo() throws CodefendException {
+    private static String getGitBranchFromLocalRepo() throws CodeFendException {
         String response = runGitCommand("git branch");
         try {
             if (response != null) {
@@ -68,7 +68,7 @@ public class GitRepo {
         return null;
     }
 
-    private static String getGitCommitFromLocalRepo() throws CodefendException {
+    private static String getGitCommitFromLocalRepo() throws CodeFendException {
         String commit = runGitCommand("git show --format=%H --no-patch");
         if (commit == null || commit.isEmpty()) {
             return null;
@@ -79,7 +79,7 @@ public class GitRepo {
     private static GitRepo getFromLocal() {
         try {
             return new GitRepo();
-        } catch (CodefendException e) {
+        } catch (CodeFendException e) {
             return null;
         }
     }
@@ -138,15 +138,15 @@ public class GitRepo {
         return gitRepoSlug;
     }
 
-    synchronized void cloneRepo(GitCredential credential) throws CodefendException {
+    synchronized void cloneRepo(GitCredential credential) throws CodeFendException {
         File currentDir = new File(System.getProperty("user.dir"));
         if (currentDir.list() != null) {
             if (Objects.requireNonNull(currentDir.list()).length > 0) {
-                throw new CodefendException("Not an empty directory");
+                throw new CodeFendException("Not an empty directory");
             }
         }
         if (getFromLocal() != null) {
-            throw new CodefendException("A repository already exists");
+            throw new CodeFendException("A repository already exists");
         }
         StringBuilder cloneCommand = new StringBuilder();
         cloneCommand.append("git clone ");
@@ -164,7 +164,7 @@ public class GitRepo {
                     Files.copy(credential.getSshPrivateKeyFile().toPath(), sshPrivateKeyFile.toPath(),
                             StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
-                    throw new CodefendException(e);
+                    throw new CodeFendException(e);
                 }
                 cloneCommand.append(this.gitRepoSshUri);
             } else {
@@ -182,12 +182,12 @@ public class GitRepo {
         runGitCommand(cloneCommand.toString());
         GitRepo localRepo = getFromLocal();
         if (localRepo == null) {
-            throw new CodefendException("Failed to clone the repo");
+            throw new CodeFendException("Failed to clone the repo");
         }
         if (this.gitRepoBranch != null && !this.gitRepoBranch.isEmpty()) {
             GitRepo local = GitRepo.getFromLocal();
             if (local == null || !local.gitRepoBranch.equalsIgnoreCase(this.gitRepoBranch)) {
-                throw new CodefendException("Something went wrong. Please validate the branch name");
+                throw new CodeFendException("Something went wrong. Please validate the branch name");
             }
         }
         if (this.gitRepoCommitHash != null && !this.gitRepoCommitHash.isEmpty()) {
@@ -195,7 +195,7 @@ public class GitRepo {
             runGitCommand("git checkout " + this.gitRepoCommitHash);
             GitRepo local = GitRepo.getFromLocal();
             if (local == null || !local.gitRepoCommitHash.equalsIgnoreCase(this.gitRepoCommitHash)) {
-                throw new CodefendException("Something went wrong. Please validate the branch name");
+                throw new CodeFendException("Something went wrong. Please validate the branch name");
             }
         }
     }

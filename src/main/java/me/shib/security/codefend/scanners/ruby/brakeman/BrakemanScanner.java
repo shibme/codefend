@@ -5,13 +5,13 @@ import me.shib.security.codefend.*;
 import java.io.File;
 import java.io.IOException;
 
-public final class BrakemanScanner extends Codefend {
+public final class BrakemanScanner extends CodeFend {
 
     private static final String tool = "Brakeman";
     private static final File brakemanOutput = new File("brakeman-result.json");
     private static final String[] excludedPaths = {"Gemfile.lock"};
 
-    public BrakemanScanner(CodefendConfig config) throws CodefendException {
+    public BrakemanScanner(CodeFendConfig config) throws CodeFendException {
         super(config);
     }
 
@@ -40,16 +40,16 @@ public final class BrakemanScanner extends Codefend {
     }
 
     @Override
-    protected void scan() throws CodefendException, IOException, InterruptedException {
+    protected void scan() throws CodeFendException, IOException, InterruptedException {
         brakemanOutput.delete();
         runBrakeman();
         processBrakemanResult();
     }
 
-    private void runBrakeman() throws CodefendException, IOException, InterruptedException {
+    private void runBrakeman() throws CodeFendException, IOException, InterruptedException {
         String response = runCommand("brakeman -o " + brakemanOutput.getAbsolutePath());
         if (response.contains("command not found") || response.contains("is currently not installed")) {
-            throw new CodefendException("Install brakeman before proceeding");
+            throw new CodeFendException("Install brakeman before proceeding");
         }
     }
 
@@ -77,10 +77,10 @@ public final class BrakemanScanner extends Codefend {
         return description.toString();
     }
 
-    private void warningToFinding(BrakemanWarning warning) throws CodefendException {
-        String title = "Brakeman warning (" + warning.getWarning_type() + ") found in " + warning.getFile();
-        CodefendPriority priority = BrakemanPriorityCalculator.getCodefendPriority(warning.getWarning_type(), warning.getConfidence());
-        CodefendFinding finding = newVulnerability(title, priority);
+    private void warningToFinding(BrakemanWarning warning) throws CodeFendException {
+        String title = "SAST warning (" + warning.getWarning_type() + ") found in " + warning.getFile() + " of " + getConfig().getProject();
+        CodeFendPriority priority = BrakemanPriorityCalculator.getCodeFendPriority(warning.getWarning_type(), warning.getConfidence());
+        CodeFendFinding finding = newVulnerability(title, priority);
         if (warning.getLink() != null) {
             finding.setField("Type", "[" + warning.getWarning_type() + "](" + warning.getLink() + ")");
         } else {
@@ -99,7 +99,7 @@ public final class BrakemanScanner extends Codefend {
         finding.update();
     }
 
-    private void processBrakemanResult() throws IOException, CodefendException {
+    private void processBrakemanResult() throws IOException, CodeFendException {
         BrakemanResult brakemanResult = BrakemanResult.getBrakemanResult(brakemanOutput);
         for (BrakemanWarning warning : brakemanResult.getWarnings()) {
             if (!isExcludedPath(warning.getFile())) {

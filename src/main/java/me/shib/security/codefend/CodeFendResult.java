@@ -2,16 +2,16 @@ package me.shib.security.codefend;
 
 import java.util.*;
 
-final class CodefendResult {
+final class CodeFendResult {
 
     private final Lang lang;
-    private final Codefend.Context context;
+    private final CodeFend.Context context;
     private final String scanner;
     private final String scanDirPath;
-    private final Map<String, CodefendFinding> vulnerabilityMap;
+    private final Map<String, CodeFendFinding> vulnerabilityMap;
     private String project;
 
-    CodefendResult(String project, Lang lang, Codefend.Context context, String scanner, String scanDirPath) {
+    CodeFendResult(String project, Lang lang, CodeFend.Context context, String scanner, String scanDirPath) {
         this.project = project;
         this.lang = lang;
         this.context = context;
@@ -20,11 +20,11 @@ final class CodefendResult {
         this.vulnerabilityMap = new HashMap<>();
     }
 
-    CodefendFinding newVulnerability(String title, CodefendPriority priority) {
-        return new CodefendFinding(this, title, priority);
+    CodeFendFinding newVulnerability(String title, CodeFendPriority priority) {
+        return new CodeFendFinding(this, title, priority);
     }
 
-    void updateVulnerability(CodefendFinding vulnerability) {
+    void updateVulnerability(CodeFendFinding vulnerability) {
         vulnerability.addKey(project);
         vulnerability.addTag(project);
         vulnerability.addKey(lang.toString());
@@ -54,7 +54,7 @@ final class CodefendResult {
         return lang;
     }
 
-    Codefend.Context getContext() {
+    CodeFend.Context getContext() {
         return context;
     }
 
@@ -66,7 +66,7 @@ final class CodefendResult {
         return scanDirPath;
     }
 
-    List<CodefendFinding> getVulnerabilities() {
+    List<CodeFendFinding> getVulnerabilities() {
         return new ArrayList<>(vulnerabilityMap.values());
     }
 }

@@ -14,31 +14,31 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class Codefend {
+public abstract class CodeFend {
 
     private static final transient String cveBaseURL = "https://nvd.nist.gov/vuln/detail/";
     private static final transient Gson gson = new GsonBuilder().setPrettyPrinting()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
-    private static final transient Set<Codefend> codefends = new HashSet<>();
+    private static final transient Set<CodeFend> codeFends = new HashSet<>();
 
-    private final transient CodefendConfig config;
-    private final transient CodefendResult result;
+    private final transient CodeFendConfig config;
+    private final transient CodeFendResult result;
 
-    public Codefend(CodefendConfig config) {
+    public CodeFend(CodeFendConfig config) {
         this.config = config;
-        this.result = new CodefendResult(config.getProject(), getLang(),
+        this.result = new CodeFendResult(config.getProject(), getLang(),
                 getContext(), getTool(), config.getScanDirPath());
     }
 
-    static synchronized void addScanner(Codefend codefend) {
-        codefends.add(codefend);
+    static synchronized void addScanner(CodeFend codefend) {
+        codeFends.add(codefend);
     }
 
-    private static synchronized List<Codefend> getCodefends(CodefendConfig config) {
-        List<Codefend> qualifiedClasses = new ArrayList<>();
+    private static synchronized List<CodeFend> getCodeFends(CodeFendConfig config) {
+        List<CodeFend> qualifiedClasses = new ArrayList<>();
         System.out.println("Attempting to run for Language: " + config.getLang());
         if (config.getLang() != null) {
-            for (Codefend codefend : codefends) {
+            for (CodeFend codefend : codeFends) {
                 try {
                     if (codefend.getLang() != null && codefend.getLang() == config.getLang()) {
                         if (config.getTool() == null || config.getTool().isEmpty() ||
@@ -54,24 +54,24 @@ public abstract class Codefend {
         return qualifiedClasses;
     }
 
-    private static synchronized void prepareScanners(CodefendConfig config) {
-        Codefend.addScanner(new BrakemanScanner(config));
-        Codefend.addScanner(new BundlerAudit(config));
-        Codefend.addScanner(new RetirejsScanner(config));
-        Codefend.addScanner(new DependencyCheck(config));
+    private static synchronized void prepareScanners(CodeFendConfig config) {
+        CodeFend.addScanner(new BrakemanScanner(config));
+        CodeFend.addScanner(new BundlerAudit(config));
+        CodeFend.addScanner(new RetirejsScanner(config));
+        CodeFend.addScanner(new DependencyCheck(config));
     }
 
-    public static synchronized List<Codefend> getScanners(CodefendConfig config) throws CodefendException {
+    public static synchronized List<CodeFend> getScanners(CodeFendConfig config) throws CodeFendException {
         prepareScanners(config);
-        List<Codefend> scanners = Codefend.getCodefends(config);
+        List<CodeFend> scanners = CodeFend.getCodeFends(config);
         if (scanners.size() > 0) {
             try {
                 buildProject(config.getBuildScript(), config.getScanDir());
-                for (Codefend codefend : scanners) {
+                for (CodeFend codefend : scanners) {
                     codefend.result.setProject(config.getProject());
                 }
             } catch (IOException | InterruptedException e) {
-                throw new CodefendException(e);
+                throw new CodeFendException(e);
             }
         } else {
             System.out.println("No scanners available to scan this code.");
@@ -79,12 +79,12 @@ public abstract class Codefend {
         return scanners;
     }
 
-    private static synchronized void buildProject(String buildScript, File scanDir) throws IOException, InterruptedException, CodefendException {
+    private static synchronized void buildProject(String buildScript, File scanDir) throws IOException, InterruptedException, CodeFendException {
         if (buildScript != null) {
             System.out.println("Running: " + buildScript);
             CommandRunner commandRunner = new CommandRunner(buildScript, scanDir, "Building Project");
             if (commandRunner.execute() != 0) {
-                throw new CodefendException("Build Failed!");
+                throw new CodeFendException("Build Failed!");
             }
         }
     }
@@ -95,11 +95,11 @@ public abstract class Codefend {
         pw.close();
     }
 
-    protected String getUrlForCVE(String cve) throws CodefendException {
+    protected String getUrlForCVE(String cve) throws CodeFendException {
         if (cve != null && cve.toUpperCase().startsWith("CVE")) {
             return cveBaseURL + cve;
         }
-        throw new CodefendException("CVE provided is not valid");
+        throw new CodeFendException("CVE provided is not valid");
     }
 
     protected String getHash(File file, int lineNo, String type, String[] args) throws IOException {
@@ -138,7 +138,7 @@ public abstract class Codefend {
         return null;
     }
 
-    protected CodefendFinding newVulnerability(String title, CodefendPriority priority) {
+    protected CodeFendFinding newVulnerability(String title, CodeFendPriority priority) {
         return result.newVulnerability(title, priority);
     }
 
@@ -169,7 +169,7 @@ public abstract class Codefend {
         return content.toString();
     }
 
-    protected CodefendConfig getConfig() {
+    protected CodeFendConfig getConfig() {
         return config;
     }
 
@@ -185,7 +185,7 @@ public abstract class Codefend {
         return result.getScanDirPath();
     }
 
-    public List<CodefendFinding> getFindings() {
+    public List<CodeFendFinding> getFindings() {
         return result.getVulnerabilities();
     }
 
@@ -198,8 +198,8 @@ public abstract class Codefend {
     protected abstract void scan() throws Exception;
 
     public enum Context {
-        SAST("Codefend-SAST"),
-        SCA("Codefend-SCA");
+        SAST("CodeFend-SAST"),
+        SCA("CodeFend-SCA");
 
         private final String label;
 

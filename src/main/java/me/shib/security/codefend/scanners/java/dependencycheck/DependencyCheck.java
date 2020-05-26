@@ -13,16 +13,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class DependencyCheck extends Codefend {
+public final class DependencyCheck extends CodeFend {
 
     private static final transient String cweBaseURL = "https://cwe.mitre.org/data/definitions/";
     private static final transient String tool = "DependencyCheck";
     private static final transient File dependencyCheckReportFile = new File("bugaudit-dependency-check-result.json");
     private static final transient int cveRecheckHours = 24;
 
-    private final CodefendConfig config;
+    private final CodeFendConfig config;
 
-    public DependencyCheck(CodefendConfig config) {
+    public DependencyCheck(CodeFendConfig config) {
         super(config);
         this.config = config;
     }
@@ -42,18 +42,18 @@ public final class DependencyCheck extends Codefend {
         return Context.SCA;
     }
 
-    private CodefendPriority getPriorityForSeverity(String severity) {
+    private CodeFendPriority getPriorityForSeverity(String severity) {
         switch (severity.toUpperCase()) {
             case "CRITICAL":
-                return CodefendPriority.P0;
+                return CodeFendPriority.P0;
             case "HIGH":
-                return CodefendPriority.P1;
+                return CodeFendPriority.P1;
             case "MEDIUM":
-                return CodefendPriority.P2;
+                return CodeFendPriority.P2;
             case "LOW":
-                return CodefendPriority.P3;
+                return CodeFendPriority.P3;
             default:
-                return CodefendPriority.P4;
+                return CodeFendPriority.P4;
         }
     }
 
@@ -64,7 +64,7 @@ public final class DependencyCheck extends Codefend {
         return null;
     }
 
-    private void processDependencyCheckReport(DependencyCheckResult dependencyCheckResult) throws CodefendException {
+    private void processDependencyCheckReport(DependencyCheckResult dependencyCheckResult) throws CodeFendException {
         class VulnDependencyPair {
             private final Vulnerability vulnerability;
             private final Dependency dependency;
@@ -105,14 +105,14 @@ public final class DependencyCheck extends Codefend {
                 String cve = vulnerability.getName();
                 String title = "Vulnerability (" + cve + ") found in " + dependency.getName() +
                         " of " + config.getGitRepo();
-                CodefendPriority priority = CodefendPriority.P4;
+                CodeFendPriority priority = CodeFendPriority.P4;
                 for (VulnDependencyPair vulnDependencyPair : vulnDependencyPairs) {
-                    CodefendPriority vulnPriority = getPriorityForSeverity(vulnDependencyPair.vulnerability.getSeverity());
+                    CodeFendPriority vulnPriority = getPriorityForSeverity(vulnDependencyPair.vulnerability.getSeverity());
                     if (vulnPriority.getRank() < priority.getRank()) {
                         priority = vulnPriority;
                     }
                 }
-                CodefendFinding codefendFinding = newVulnerability(title, priority);
+                CodeFendFinding codefendFinding = newVulnerability(title, priority);
 
                 String message = "A known vulnerability was found in **" +
                         dependency.getFileName() + "** of " + "**[" +
@@ -185,7 +185,7 @@ public final class DependencyCheck extends Codefend {
     }
 
     @Override
-    protected void scan() throws IOException, InterruptedException, CodefendException {
+    protected void scan() throws IOException, InterruptedException, CodeFendException {
         dependencyCheckReportFile.delete();
         runDependecyCheck();
         DependencyCheckResult dependencyCheckResult = DependencyCheckResult.getResult(dependencyCheckReportFile);

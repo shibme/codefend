@@ -9,47 +9,47 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class RetirejsScanner extends Codefend {
+public final class RetirejsScanner extends CodeFend {
 
     private static final transient String tool = "RetireJS";
     private static final transient File retireJsResultFile = new File("bugaudit-retirejs-result.json");
 
-    public RetirejsScanner(CodefendConfig config) throws CodefendException {
+    public RetirejsScanner(CodeFendConfig config) throws CodeFendException {
         super(config);
     }
 
-    private static CodefendPriority getPriorityForSeverity(String severity) {
+    private static CodeFendPriority getPriorityForSeverity(String severity) {
         switch (severity) {
             case "critical":
             case "urgent":
-                return CodefendPriority.P0;
+                return CodeFendPriority.P0;
             case "high":
-                return CodefendPriority.P1;
+                return CodeFendPriority.P1;
             case "low":
-                return CodefendPriority.P2;
+                return CodeFendPriority.P2;
             default:
-                return CodefendPriority.P3;
+                return CodeFendPriority.P3;
         }
     }
 
-    private void retirejsExecutor(String command) throws CodefendException, IOException, InterruptedException {
+    private void retirejsExecutor(String command) throws CodeFendException, IOException, InterruptedException {
         String response = runCommand(command);
         if (response.contains("command not found") || response.contains("is currently not installed")) {
-            throw new CodefendException("Install npm before proceeding");
+            throw new CodeFendException("Install npm before proceeding");
         }
     }
 
-    private void npmProjectBuild() throws CodefendException, IOException, InterruptedException {
+    private void npmProjectBuild() throws CodeFendException, IOException, InterruptedException {
         System.out.println("Building Project...");
         retirejsExecutor("npm install");
     }
 
-    private void runRetireJS() throws CodefendException, IOException, InterruptedException {
+    private void runRetireJS() throws CodeFendException, IOException, InterruptedException {
         System.out.println("Running RetireJS...");
         retirejsExecutor("retire -p --outputformat json --outputpath " + retireJsResultFile.getAbsolutePath());
     }
 
-    private void parseResultData() throws IOException, CodefendException {
+    private void parseResultData() throws IOException, CodeFendException {
         List<RetirejsResult.Data> dataList = RetirejsResult.getResult(RetirejsScanner.retireJsResultFile);
         if (dataList != null) {
             for (RetirejsResult.Data data : dataList) {
@@ -60,15 +60,17 @@ public final class RetirejsScanner extends Codefend {
                                 StringBuilder title = new StringBuilder();
                                 if (vulnerability.getBelow() != null) {
                                     title.append("Vulnerability found in ").append(result.getComponent())
-                                            .append(" (Below ").append(vulnerability.getBelow()).append(")");
+                                            .append(" (Below ").append(vulnerability.getBelow()).append(") of ")
+                                            .append(getConfig().getProject());
                                 } else if (vulnerability.getAtOrAbove() != null) {
                                     title.append("Vulnerability found in ").append(result.getComponent())
                                             .append(" (At/Above ").append(vulnerability.getAtOrAbove())
-                                            .append(")");
+                                            .append(") of ").append(getConfig().getProject());
                                 } else {
-                                    title.append("Vulnerability found in ").append(result.getComponent());
+                                    title.append("Vulnerability found in ").append(result.getComponent())
+                                            .append(" of ").append(getConfig().getProject());
                                 }
-                                CodefendFinding finding = newVulnerability(title.toString(),
+                                CodeFendFinding finding = newVulnerability(title.toString(),
                                         getPriorityForSeverity(vulnerability.getSeverity()));
                                 StringBuilder description = new StringBuilder();
                                 description.append("A known vulnerability in **")
@@ -149,7 +151,7 @@ public final class RetirejsScanner extends Codefend {
                                             finding.addKey(cve);
                                             try {
                                                 description.append(" ").append("[").append(cve).append("](").append(getUrlForCVE(cve)).append(")");
-                                            } catch (CodefendException e) {
+                                            } catch (CodeFendException e) {
                                                 description.append(" ").append(cve);
                                             }
                                         }
@@ -202,7 +204,7 @@ public final class RetirejsScanner extends Codefend {
     }
 
     @Override
-    protected void scan() throws CodefendException, IOException, InterruptedException {
+    protected void scan() throws CodeFendException, IOException, InterruptedException {
         retireJsResultFile.delete();
         npmProjectBuild();
         runRetireJS();

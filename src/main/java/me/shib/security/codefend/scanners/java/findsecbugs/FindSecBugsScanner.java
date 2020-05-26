@@ -21,7 +21,7 @@ import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class FindSecBugsScanner extends Codefend {
+public final class FindSecBugsScanner extends CodeFend {
 
     private static transient final Lang scannerLang = Lang.Java;
     private static transient final String tool = "FindSecBugs";
@@ -30,9 +30,9 @@ public final class FindSecBugsScanner extends Codefend {
     private static transient final int java_Gradle = 2;
     private final List<String> modulePaths = new ArrayList<>();
 
-    private CodefendConfig config;
+    private CodeFendConfig config;
 
-    public FindSecBugsScanner(CodefendConfig config) {
+    public FindSecBugsScanner(CodeFendConfig config) {
         super(config);
     }
 
@@ -373,7 +373,7 @@ public final class FindSecBugsScanner extends Codefend {
         return bugsList;
     }
 
-    private void addKeys(CodefendFinding vulnerability, FindSecBugsWarning warning) {
+    private void addKeys(CodeFendFinding vulnerability, FindSecBugsWarning warning) {
         vulnerability.addKey(warning.getFilePath());
         vulnerability.addKey(config.getGitRepo() + "-" + warning.getInstanceHash());
         vulnerability.addKey(warning.getBugType().replace(" ", "-"));
@@ -382,7 +382,7 @@ public final class FindSecBugsScanner extends Codefend {
     private void warningsToVulns(List<FindSecBugsWarning> warnings) {
         for (FindSecBugsWarning warning : warnings) {
             String title = "FindSecBugs (" + warning.getBugType() + ") found in " + warning.getFilePath() + config.getGitRepo();
-            CodefendFinding finding = newVulnerability(title, CodefendPriority.valueOf("P" + warning.getSeverity()));
+            CodeFendFinding finding = newVulnerability(title, CodeFendPriority.valueOf("P" + warning.getSeverity()));
             String message = "The following insecure code was found **[was found](" +
                     config.getGitRepo().getGitRepoWebURL() +
                     "/tree/" + config.getGitRepo().getGitRepoCommitHash() + ")";
@@ -435,7 +435,7 @@ public final class FindSecBugsScanner extends Codefend {
             command = "mvn spotbugs:spotbugs" + extraArgument;
             String spotBugsResponse = runCommand(command);
             if (!spotBugsResponse.contains("BUILD SUCCESS"))
-                throw new CodefendException("FindSecBugs failed!");
+                throw new CodeFendException("FindSecBugs failed!");
         } else if (buildType == java_Gradle) {
             modifyXMLsForEnvironment(config.getScanDir(), java_Gradle);
 
@@ -443,7 +443,7 @@ public final class FindSecBugsScanner extends Codefend {
             String findBugsResponse = runCommand(command);
 
             if (!findBugsResponse.contains("BUILD SUCCESSFUL"))
-                throw new CodefendException("FindSecBugs failed!");
+                throw new CodeFendException("FindSecBugs failed!");
 
         }
 

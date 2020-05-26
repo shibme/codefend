@@ -1,6 +1,6 @@
 package me.shib.security.codefend.scanners.ruby.brakeman;
 
-import me.shib.security.codefend.CodefendPriority;
+import me.shib.security.codefend.CodeFendPriority;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +53,7 @@ final class BrakemanPriorityCalculator {
         confidenceToNumberMap.put("Weak", 3);
     }
 
-    static CodefendPriority getCodefendPriority(String type, String confidence) {
+    static CodeFendPriority getCodeFendPriority(String type, String confidence) {
         Integer typeNumber = null;
         Integer confidenceNumber = null;
         if (type != null) {
@@ -68,7 +68,7 @@ final class BrakemanPriorityCalculator {
         if (confidenceNumber == null) {
             confidenceNumber = 2;
         }
-        return CodefendPriority.valueOf("P" + priorityConfidenceMatrix[typeNumber][confidenceNumber]);
+        return CodeFendPriority.valueOf("P" + priorityConfidenceMatrix[typeNumber][confidenceNumber]);
     }
 
 }
