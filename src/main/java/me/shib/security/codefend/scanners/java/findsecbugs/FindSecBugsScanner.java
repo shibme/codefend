@@ -382,7 +382,7 @@ public final class FindSecBugsScanner extends CodeFend {
     private void warningsToVulns(List<FindSecBugsWarning> warnings) {
         for (FindSecBugsWarning warning : warnings) {
             String title = "FindSecBugs (" + warning.getBugType() + ") found in " + warning.getFilePath() + config.getGitRepo();
-            CodeFendFinding finding = newVulnerability(title, CodeFendPriority.valueOf("P" + warning.getSeverity()));
+            CodeFendFinding finding = newFinding(title, CodeFendPriority.valueOf("P" + warning.getSeverity()));
             String message = "The following insecure code was found **[was found](" +
                     config.getGitRepo().getGitRepoWebURL() +
                     "/tree/" + config.getGitRepo().getGitRepoCommitHash() + ")";

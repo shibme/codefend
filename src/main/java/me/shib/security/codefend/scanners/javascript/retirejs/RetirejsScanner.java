@@ -70,7 +70,7 @@ public final class RetirejsScanner extends CodeFend {
                                     title.append("Vulnerability found in ").append(result.getComponent())
                                             .append(" of ").append(getConfig().getProject());
                                 }
-                                CodeFendFinding finding = newVulnerability(title.toString(),
+                                CodeFendFinding finding = newFinding(title.toString(),
                                         getPriorityForSeverity(vulnerability.getSeverity()));
                                 StringBuilder description = new StringBuilder();
                                 description.append("A known vulnerability in **")

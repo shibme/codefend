@@ -138,8 +138,8 @@ public abstract class CodeFend {
         return null;
     }
 
-    protected CodeFendFinding newVulnerability(String title, CodeFendPriority priority) {
-        return result.newVulnerability(title, priority);
+    protected CodeFendFinding newFinding(String title, CodeFendPriority priority) {
+        return result.newFinding(title, priority);
     }
 
     protected String runCommand(String command) throws IOException, InterruptedException {
@@ -186,7 +186,7 @@ public abstract class CodeFend {
     }
 
     public List<CodeFendFinding> getFindings() {
-        return result.getVulnerabilities();
+        return result.getFindings();
     }
 
     public abstract Lang getLang();
@@ -209,6 +209,11 @@ public abstract class CodeFend {
 
         public String getLabel() {
             return label;
+        }
+
+        @Override
+        public String toString() {
+            return getLabel();
         }
     }
 

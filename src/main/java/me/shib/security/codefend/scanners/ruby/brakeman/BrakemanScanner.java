@@ -80,7 +80,7 @@ public final class BrakemanScanner extends CodeFend {
     private void warningToFinding(BrakemanWarning warning) throws CodeFendException {
         String title = "SAST warning (" + warning.getWarning_type() + ") found in " + warning.getFile() + " of " + getConfig().getProject();
         CodeFendPriority priority = BrakemanPriorityCalculator.getCodeFendPriority(warning.getWarning_type(), warning.getConfidence());
-        CodeFendFinding finding = newVulnerability(title, priority);
+        CodeFendFinding finding = newFinding(title, priority);
         if (warning.getLink() != null) {
             finding.setField("Type", "[" + warning.getWarning_type() + "](" + warning.getLink() + ")");
         } else {

@@ -95,7 +95,7 @@ public final class BundlerAudit extends CodeFend {
         }
         String title = "Vulnerable Gem (" + advisory + ") - " + gemName +
                 " in project - " + getConfig().getProject();
-        CodeFendFinding finding = newVulnerability(title, priority);
+        CodeFendFinding finding = newFinding(title, priority);
         finding.setField("Description", descriptionTitle);
         finding.setField("Gem Name", gemName);
         finding.setField("Gem Version", gemVersion);

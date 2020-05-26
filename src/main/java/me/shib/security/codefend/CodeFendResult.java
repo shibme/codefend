@@ -8,7 +8,7 @@ final class CodeFendResult {
     private final CodeFend.Context context;
     private final String scanner;
     private final String scanDirPath;
-    private final Map<String, CodeFendFinding> vulnerabilityMap;
+    private final Map<String, CodeFendFinding> findingMap;
     private String project;
 
     CodeFendResult(String project, Lang lang, CodeFend.Context context, String scanner, String scanDirPath) {
@@ -17,29 +17,29 @@ final class CodeFendResult {
         this.context = context;
         this.scanner = scanner;
         this.scanDirPath = scanDirPath;
-        this.vulnerabilityMap = new HashMap<>();
+        this.findingMap = new HashMap<>();
     }
 
-    CodeFendFinding newVulnerability(String title, CodeFendPriority priority) {
+    CodeFendFinding newFinding(String title, CodeFendPriority priority) {
         return new CodeFendFinding(this, title, priority);
     }
 
-    void updateVulnerability(CodeFendFinding vulnerability) {
-        vulnerability.addKey(project);
-        vulnerability.addTag(project);
-        vulnerability.addKey(lang.toString());
-        vulnerability.addTag(lang.toString());
-        vulnerability.addKey(context.toString());
-        vulnerability.addTag(context.toString());
-        vulnerability.addKey(scanner);
-        vulnerability.addTag(scanner);
+    void updateFinding(CodeFendFinding finding) {
+        finding.addKey(project);
+        finding.addTag(project);
+        finding.addKey(lang.toString());
+        finding.addTag(lang.toString());
+        finding.addKey(context.getLabel());
+        finding.addTag(context.getLabel());
+        finding.addKey(scanner);
+        finding.addTag(scanner);
         StringBuilder key = new StringBuilder();
-        List<String> keyList = new ArrayList<>(vulnerability.getKeys());
+        List<String> keyList = new ArrayList<>(finding.getKeys());
         Collections.sort(keyList);
         for (String k : keyList) {
             key.append(k).append(";");
         }
-        vulnerabilityMap.put(key.toString(), vulnerability);
+        findingMap.put(key.toString(), finding);
     }
 
     String getProject() {
@@ -66,7 +66,7 @@ final class CodeFendResult {
         return scanDirPath;
     }
 
-    List<CodeFendFinding> getVulnerabilities() {
-        return new ArrayList<>(vulnerabilityMap.values());
+    List<CodeFendFinding> getFindings() {
+        return new ArrayList<>(findingMap.values());
     }
 }

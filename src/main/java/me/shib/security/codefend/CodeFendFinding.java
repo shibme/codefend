@@ -24,7 +24,7 @@ public final class CodeFendFinding {
     }
 
     public void update() {
-        result.updateVulnerability(this);
+        result.updateFinding(this);
     }
 
     public void addKey(String key) throws CodeFendException {

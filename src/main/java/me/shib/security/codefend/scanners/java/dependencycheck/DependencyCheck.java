@@ -112,7 +112,7 @@ public final class DependencyCheck extends CodeFend {
                         priority = vulnPriority;
                     }
                 }
-                CodeFendFinding codefendFinding = newVulnerability(title, priority);
+                CodeFendFinding codefendFinding = newFinding(title, priority);
 
                 String message = "A known vulnerability was found in **" +
                         dependency.getFileName() + "** of " + "**[" +
