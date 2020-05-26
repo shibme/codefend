@@ -31,6 +31,7 @@ final class CodeFendLauncher {
                 codefend.scan();
             } catch (Exception e) {
                 e.printStackTrace();
+                System.exit(1);
             }
         }
         processResults(config, scanners);
