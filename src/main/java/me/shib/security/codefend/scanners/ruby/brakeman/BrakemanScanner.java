@@ -96,6 +96,7 @@ public final class BrakemanScanner extends CodeFend {
         finding.addKey(warning.getFile());
         finding.addKey("Brakeman-" + warning.getFingerprint());
         finding.setDescription(getDescription(warning));
+        finding.addTag(warning.getWarning_type().replace(" ", "-"));
         finding.update();
     }
 
