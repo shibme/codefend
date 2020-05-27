@@ -7,11 +7,11 @@ import java.util.Map;
 
 final class BrakemanPriorityCalculator {
 
-    private static final int[][] priorityConfidenceMatrix = new int[][]{
-            {0, 1, 2},
-            {1, 1, 2},
-            {2, 2, 3},
-            {3, 3, 3}
+    private static final CodeFendPriority[][] priorityConfidenceMatrix = new CodeFendPriority[][]{
+            {CodeFendPriority.P0, CodeFendPriority.P1, CodeFendPriority.P2},
+            {CodeFendPriority.P1, CodeFendPriority.P1, CodeFendPriority.P2},
+            {CodeFendPriority.P2, CodeFendPriority.P2, CodeFendPriority.P3},
+            {CodeFendPriority.P3, CodeFendPriority.P3, CodeFendPriority.P3}
     };
 
     private static final Map<String, Integer> typeToNumberMap;
@@ -68,7 +68,7 @@ final class BrakemanPriorityCalculator {
         if (confidenceNumber == null) {
             confidenceNumber = 2;
         }
-        return CodeFendPriority.valueOf("P" + priorityConfidenceMatrix[typeNumber][confidenceNumber]);
+        return priorityConfidenceMatrix[typeNumber][confidenceNumber];
     }
 
 }

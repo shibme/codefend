@@ -26,9 +26,9 @@ public final class RetirejsScanner extends CodeFend {
             case "high":
                 return CodeFendPriority.P1;
             case "low":
-                return CodeFendPriority.P2;
-            default:
                 return CodeFendPriority.P3;
+            default:
+                return CodeFendPriority.P2;
         }
     }
 
