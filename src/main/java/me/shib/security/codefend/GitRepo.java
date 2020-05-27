@@ -155,18 +155,18 @@ public class GitRepo {
         }
         cloneCommand.append("--depth 1 ");
         String cloneUri;
+        File localSshPrivateKeyFile = new File(System.getProperty("user.home") + File.separator +
+                ".ssh" + File.separator + "id_rsa");
         if (credential != null) {
             if (credential.getSshPrivateKeyFile() != null) {
                 cloneUri = this.gitRepoSshUri;
-                File sshPrivateKeyFile = new File(System.getProperty("user.home") + File.separator +
-                        ".ssh" + File.separator + "id_rsa");
                 try {
-                    Files.copy(credential.getSshPrivateKeyFile().toPath(), sshPrivateKeyFile.toPath(),
+                    Files.copy(credential.getSshPrivateKeyFile().toPath(), localSshPrivateKeyFile.toPath(),
                             StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     throw new CodeFendException(e);
                 }
-                cloneCommand.append(this.gitRepoSshUri);
+                cloneCommand.append(cloneUri);
             } else {
                 cloneUri = this.gitRepoHttpUri;
                 String[] splitUrl = this.gitRepoHttpUri.split("//");
@@ -174,8 +174,12 @@ public class GitRepo {
                         .append(":").append(credential.getGitAccessToken()).append("@").append(splitUrl[1]);
             }
         } else {
-            cloneUri = this.gitRepoHttpUri;
-            cloneCommand.append(this.gitRepoHttpUri);
+            if (localSshPrivateKeyFile.exists()) {
+                cloneUri = this.gitRepoSshUri;
+            } else {
+                cloneUri = this.gitRepoHttpUri;
+            }
+            cloneCommand.append(cloneUri);
         }
         cloneCommand.append(" .");
         System.out.println("Cloning Repository: " + cloneUri);
