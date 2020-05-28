@@ -29,7 +29,7 @@ public final class BundlerAudit extends CodeInspect {
             case "Low":
                 return CodeInspectPriority.P3;
             default:
-                return CodeInspectPriority.P2;
+                return CodeInspectPriority.P1;
         }
     }
 
@@ -49,7 +49,7 @@ public final class BundlerAudit extends CodeInspect {
             description.append("\n * **Description:** ").append(descriptionTitle);
         }
         if (url != null && !url.isEmpty()) {
-            description.append("\n * **Reference:** [").append(url).append("]");
+            description.append("\n * **Reference:** [").append(url).append("](").append(url).append(")");
         }
         if (solution != null && !solution.isEmpty()) {
             description.append("\n * **Solution:** ").append(solution);
@@ -105,7 +105,7 @@ public final class BundlerAudit extends CodeInspect {
             finding.setField("Advisory", advisory);
         }
         finding.setField("Solution", solution);
-        finding.setField("Reference", url);
+        finding.setField("Reference", "[" + url + "](" + url + ")");
         if (gemName.isEmpty() || advisory.isEmpty()) {
             return;
         }
