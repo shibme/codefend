@@ -4,21 +4,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.shib.security</groupId>
-    <artifactId>codefend</artifactId>
+    <artifactId>codeinspect</artifactId>
     <version>1.0.0</version>
-    <name>CodeFend</name>
+    <name>CodeInspect</name>
     <description>A static code analysis tool which makes use of existing open source tools and libraries</description>
-    <url>https://gitlab.com/${project.owner.id}/${project.artifactId}</url>
+    <url>https://gitlab.com/shibme/codeinspect</url>
 
     <issueManagement>
-        <url>https://gitlab.com/${project.owner.id}/${project.artifactId}/issues</url>
+        <url>https://gitlab.com/shibme/codeinspect/issues</url>
         <system>GitLab Issues</system>
     </issueManagement>
 
     <scm>
-        <url>https://gitlab.com/${project.owner.id}/${project.artifactId}</url>
-        <connection>scm:git:https://gitlab.com/${project.owner.id}/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:git@gitlab.com:${project.owner.id}/${project.artifactId}.git</developerConnection>
+        <url>https://gitlab.com/shibme/codeinspect</url>
+        <connection>scm:git:https://gitlab.com/shibme/codeinspect.git</connection>
+        <developerConnection>scm:git:git@gitlab.com:shibme/codeinspect.git</developerConnection>
     </scm>
 
     <developers>
@@ -31,14 +31,13 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.owner.id>shibme</project.owner.id>
     </properties>
 
     <distributionManagement>
         <repository>
-            <id>bintray-${project.owner.id}-maven</id>
-            <name>${project.owner.id}-maven</name>
-            <url>https://api.bintray.com/maven/${project.owner.id}/maven/${project.artifactId}/;publish=1;override=1
+            <id>bintray-shibme-maven</id>
+            <name>shibme-maven</name>
+            <url>https://api.bintray.com/maven/shibme/maven/codeinspect/;publish=1;override=1
             </url>
         </repository>
     </distributionManagement>
@@ -102,13 +101,13 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <finalName>codefend</finalName>
+                    <finalName>codeinspect</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>me.shib.security.codefend.CodeFendLauncher</mainClass>
+                            <mainClass>me.shib.security.codeinspect.CodeInspectLauncher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

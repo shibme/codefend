@@ -1,7 +1,7 @@
-FROM shibme/codefend-base
+FROM shibme/codeinspect-base
 LABEL maintainer="shibme"
-RUN mkdir -p /codefend-bin
+RUN mkdir -p /codeinspect-bin
 RUN mkdir -p /root/.ssh
-ADD target/codefend-jar-with-dependencies.jar /codefend-bin/run-codefend.jar
-WORKDIR /codefend
-CMD ["java","-jar","/codefend-bin/run-codefend.jar"]
+ADD target/codeinspect-jar-with-dependencies.jar /codeinspect-bin/run-codeinspect.jar
+WORKDIR /codeinspect
+CMD ["java","-jar","/codeinspect-bin/run-codeinspect.jar"]

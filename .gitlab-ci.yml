@@ -16,12 +16,12 @@ Maven Build:
   artifacts:
     expire_in: 1 hour
     paths:
-      - target/codefend-jar-with-dependencies.jar
+      - target/codeinspect-jar-with-dependencies.jar
 
 Docker Build:
   stage: "Release"
   variables:
-    DOCKER_IMAGE: "shibme/codefend"
+    DOCKER_IMAGE: "shibme/codeinspect"
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker build -t $DOCKER_IMAGE .
