@@ -6,10 +6,6 @@ if test "${DOCKER_VERSION_RESPONSE#*$EXPECTED_RESPONSE}" != "$DOCKER_VERSION_RES
   if [ -z "$CODEINSPECT_GIT_SSHKEY" ]; then
     export CODEINSPECT_GIT_SSHKEY="$HOME/.ssh/id_rsa"
   fi
-
-  if [ -n "$JOB_BASE_NAME" ]; then
-    CODEINSPECT_CONTAINER="$JOB_BASE_NAME"
-  fi
   if [ -z "$CODEINSPECT_CONTAINER" ]; then
     CODEINSPECT_CONTAINER="codeinspect"
   fi
