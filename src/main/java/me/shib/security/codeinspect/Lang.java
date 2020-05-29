@@ -18,7 +18,6 @@ public enum Lang {
         this.extensions = extensions;
     }
 
-
     private static int indexOfLastSeparator(final String filename) {
         if (filename == null) {
             return -1;

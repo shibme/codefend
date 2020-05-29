@@ -6,19 +6,6 @@ import java.util.Date;
 
 public final class CodeInspectConfig {
 
-    private static final transient String CODEINSPECT_PROJECT = "CODEINSPECT_PROJECT";
-    private static final transient String CODEINSPECT_DIR = "CODEINSPECT_DIR";
-    private static final transient String CODEINSPECT_CONTEXT = "CODEINSPECT_CONTEXT";
-    private static final transient String CODEINSPECT_LANG = "CODEINSPECT_LANG";
-    private static final transient String CODEINSPECT_TOOL = "CODEINSPECT_TOOL";
-    private static final transient String CODEINSPECT_BUILDSCRIPT = "CODEINSPECT_BUILDSCRIPT";
-    private static final transient String CODEINSPECT_GIT_REPO = "CODEINSPECT_GIT_REPO";
-    private static final transient String CODEINSPECT_GIT_BRANCH = "CODEINSPECT_GIT_BRANCH";
-    private static final transient String CODEINSPECT_GIT_COMMIT = "CODEINSPECT_GIT_COMMIT";
-    private static final transient String CODEINSPECT_GIT_USERNAME = "CODEINSPECT_GIT_USERNAME";
-    private static final transient String CODEINSPECT_GIT_TOKEN = "CODEINSPECT_GIT_TOKEN";
-    private static final transient String CODEINSPECT_GIT_SSHKEY = "CODEINSPECT_GIT_SSHKEY";
-
     private static transient CodeInspectConfig config;
 
     private transient File scanDir;
@@ -57,26 +44,17 @@ public final class CodeInspectConfig {
     }
 
     private synchronized GitRepo buildGitRepoFromEnv() {
-        String gitUri = envValue(CODEINSPECT_GIT_REPO);
-        if (gitUri == null || gitUri.isEmpty()) {
+        String gitUri = CodeInspectEnv.CODEINSPECT_GIT_REPO.getAsString();
+        if (gitUri == null) {
             return null;
         }
-        String gitBranch = envValue(CODEINSPECT_GIT_BRANCH);
-        String gitCommit = envValue(CODEINSPECT_GIT_COMMIT);
-        return new GitRepo(gitUri, gitBranch, gitCommit);
-    }
-
-    private String envValue(String var) {
-        String value = System.getenv(var);
-        if (value != null && !value.isEmpty()) {
-            return value;
-        }
-        return null;
+        return new GitRepo(gitUri, CodeInspectEnv.CODEINSPECT_GIT_BRANCH.getAsString(),
+                CodeInspectEnv.CODEINSPECT_GIT_COMMIT.getAsString());
     }
 
     private CodeInspect.Context buildContextFromEnv() {
         try {
-            return CodeInspect.Context.valueOf(envValue(CODEINSPECT_CONTEXT));
+            return CodeInspect.Context.valueOf(CodeInspectEnv.CODEINSPECT_CONTEXT.getAsString());
         } catch (Exception e) {
             return null;
         }
@@ -84,7 +62,7 @@ public final class CodeInspectConfig {
 
     private Lang buildLangFromEnvOrContent(File scanDir) {
         try {
-            return Lang.valueOf(envValue(CODEINSPECT_LANG));
+            return Lang.valueOf(CodeInspectEnv.CODEINSPECT_LANG.getAsString());
         } catch (Exception e) {
             return Lang.getLangFromDir(scanDir);
         }
@@ -135,7 +113,7 @@ public final class CodeInspectConfig {
             gitRepo = new GitRepo();
         }
         if (project == null) {
-            project = envValue(CODEINSPECT_PROJECT);
+            project = CodeInspectEnv.CODEINSPECT_PROJECT.getAsString();
             if (project == null || project.isEmpty()) {
                 if (gitRepo != null) {
                     project = gitRepo.getGitRepoSlug();
@@ -159,10 +137,10 @@ public final class CodeInspectConfig {
             context = buildContextFromEnv();
         }
         if (tool == null) {
-            tool = envValue(CODEINSPECT_TOOL);
+            tool = CodeInspectEnv.CODEINSPECT_TOOL.getAsString();
         }
         if (buildScript == null) {
-            buildScript = envValue(CODEINSPECT_BUILDSCRIPT);
+            buildScript = CodeInspectEnv.CODEINSPECT_BUILDSCRIPT.getAsString();
         }
     }
 
@@ -171,7 +149,7 @@ public final class CodeInspectConfig {
     }
 
     private String buildScanDirPathFromEnvOrCurrentDir() {
-        String scanDirPath = envValue(CODEINSPECT_DIR);
+        String scanDirPath = CodeInspectEnv.CODEINSPECT_DIR.getAsString();
         String currentPath = System.getProperty("user.dir");
         if (scanDirPath != null && !scanDirPath.startsWith("/")) {
             File scanDir = new File(scanDirPath);
@@ -183,9 +161,9 @@ public final class CodeInspectConfig {
     }
 
     private synchronized GitCredential buildGitCredentialFromEnv() {
-        String gitUsername = envValue(CODEINSPECT_GIT_USERNAME);
-        String gitAccessToken = envValue(CODEINSPECT_GIT_TOKEN);
-        String sshPrivateKeyFilePath = envValue(CODEINSPECT_GIT_SSHKEY);
+        String gitUsername = CodeInspectEnv.CODEINSPECT_GIT_USERNAME.getAsString();
+        String gitAccessToken = CodeInspectEnv.CODEINSPECT_GIT_TOKEN.getAsString();
+        String sshPrivateKeyFilePath = CodeInspectEnv.CODEINSPECT_GIT_SSHKEY.getAsString();
         if (sshPrivateKeyFilePath != null) {
             File sshPrivateKeyFile = new File(sshPrivateKeyFilePath);
             if (sshPrivateKeyFile.exists()) {

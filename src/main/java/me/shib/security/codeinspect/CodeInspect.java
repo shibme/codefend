@@ -43,7 +43,9 @@ public abstract class CodeInspect {
                     if (codeinspect.getLang() != null && codeinspect.getLang() == config.getLang()) {
                         if (config.getTool() == null || config.getTool().isEmpty() ||
                                 config.getTool().equalsIgnoreCase(codeinspect.getTool())) {
-                            qualifiedClasses.add(codeinspect);
+                            if (config.getContext() == null || codeinspect.getContext() == codeinspect.getContext()) {
+                                qualifiedClasses.add(codeinspect);
+                            }
                         }
                     }
                 } catch (Exception e) {
