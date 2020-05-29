@@ -7,9 +7,9 @@ if test "${DOCKER_VERSION_RESPONSE#*$EXPECTED_RESPONSE}" != "$DOCKER_VERSION_RES
     export CODEINSPECT_GIT_SSHKEY="$HOME/.ssh/id_rsa"
   fi
   if [ -z "$CODEINSPECT_CONTAINER" ]; then
-    CODEINSPECT_CONTAINER="codeinspect"
+    export CODEINSPECT_CONTAINER="CodeInspect"
   fi
-  CODEINSPECT_CONTAINER=${CODEINSPECT_CONTAINER// /_}
+  export CODEINSPECT_CONTAINER=${CODEINSPECT_CONTAINER// /_}
   if [ -z "$CODEINSPECT_IMAGE" ]; then
     export CODEINSPECT_IMAGE="shibme/codeinspect"
     docker pull "$CODEINSPECT_IMAGE"
@@ -68,7 +68,7 @@ if test "${DOCKER_VERSION_RESPONSE#*$EXPECTED_RESPONSE}" != "$DOCKER_VERSION_RES
   CODEINSPECT_COMMAND="$CODEINSPECT_COMMAND -v $(pwd):/codeinspect $CODEINSPECT_IMAGE"
 
   echo "Starting container: $CODEINSPECT_CONTAINER"
-  echo $CODEINSPECT_COMMAND | bash
+  echo "$CODEINSPECT_COMMAND" | bash
 else
   echo "Please install docker client before you begin."
   exit 1
