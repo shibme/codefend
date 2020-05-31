@@ -29,7 +29,7 @@ public final class BundlerAudit extends CodeInspect {
             case "Low":
                 return CodeInspectPriority.P3;
             default:
-                return CodeInspectPriority.P1;
+                return CodeInspectPriority.P2;
         }
     }
 
