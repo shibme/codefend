@@ -12,8 +12,10 @@ final class CodeInspectLauncher {
     private static void processResults(CodeInspectConfig config, List<CodeInspect> inspectors) {
         try {
             List<CodeInspectFinding> findings = new ArrayList<>();
-            for (CodeInspect codeinspect : inspectors) {
-                findings.addAll(codeinspect.getFindings());
+            for (CodeInspect inspector : inspectors) {
+                System.out.println("Findings from " + inspector.getTool() + " [" + inspector.getContext() + "]: " +
+                        inspector.getFindings().size());
+                findings.addAll(inspector.getFindings());
             }
             StewardData data = StewardAdapter.toStewardData(config, findings);
             Steward.process(data, StewardConfig.getConfig());
