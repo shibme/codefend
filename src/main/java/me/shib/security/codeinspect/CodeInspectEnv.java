@@ -6,10 +6,10 @@ import java.util.List;
 
 enum CodeInspectEnv {
 
-    CODEINSPECT_PROJECT("Project name of the scan"),
+    CODEINSPECT_PROJECT("Project name of the scan [If not set, will use repo slug or sets a random name with TimeStamp]"),
     CODEINSPECT_DIR("Specific directory inside the current directory to be scanned"),
     CODEINSPECT_CONTEXT("Type of scan [SAST or SCA - Does both by default]"),
-    CODEINSPECT_LANG("Target language to be scanned [" + langAsList() + "]."),
+    CODEINSPECT_LANG("Target language to be scanned [" + langAsList() + " - if not specified, detects from source]."),
     CODEINSPECT_BUILDSCRIPT("Any script that needs to be run before scan."),
     CODEINSPECT_TOOL("One of the available tool's name to be used specifically"),
     CODEINSPECT_GIT_REPO("Git repository URI if source is not available in current directory"),
