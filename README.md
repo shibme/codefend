@@ -4,8 +4,8 @@
 A static code analysis tool which makes use of existing open source tools and libraries
 
 ### Before we start,
-- Install the latest Docker CLI to be installed in the environment
-- Have to source code that has to be scanned inside the working directory
+- Make sure the latest Docker CLI has been installed
+- Have the source code that needs to be scanned inside the working directory
 
 #### A bunch of environment variables for CodeInspect 🤷 [All optional]
 `CODEINSPECT_PROJECT`
