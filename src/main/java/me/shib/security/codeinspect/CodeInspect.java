@@ -3,6 +3,7 @@ package me.shib.security.codeinspect;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.shib.security.codeinspect.scanners.java.dependencycheck.DependencyCheck;
+import me.shib.security.codeinspect.scanners.java.findsecbugs.FindSecBugsScanner;
 import me.shib.security.codeinspect.scanners.javascript.retirejs.RetirejsScanner;
 import me.shib.security.codeinspect.scanners.ruby.brakeman.BrakemanScanner;
 import me.shib.security.codeinspect.scanners.ruby.bundleraudit.BundlerAudit;
@@ -61,6 +62,7 @@ public abstract class CodeInspect {
         CodeInspect.addScanner(new BundlerAudit(config));
         CodeInspect.addScanner(new RetirejsScanner(config));
         CodeInspect.addScanner(new DependencyCheck(config));
+        CodeInspect.addScanner(new FindSecBugsScanner(config));
     }
 
     public static synchronized List<CodeInspect> getScanners(CodeInspectConfig config) throws CodeInspectException {

@@ -102,7 +102,7 @@ public final class FindSecBugsScanner extends CodeInspect {
             else
                 confidenceLevel = confidenceLevel.substring(0, 1).toUpperCase() + confidenceLevel.substring(1).toLowerCase();
 
-            if (fileName == "pom.xml") {
+            if (fileName.equals("pom.xml")) {
 
                 String pluginStr = "<plugin>\n" +
                         "            <groupId>com.github.spotbugs</groupId>\n" +
