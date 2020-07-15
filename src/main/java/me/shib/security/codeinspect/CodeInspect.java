@@ -41,10 +41,10 @@ public abstract class CodeInspect {
         if (config.getLang() != null) {
             for (CodeInspect codeinspect : inspectors) {
                 try {
-                    if (codeinspect.getLang() != null && codeinspect.getLang() == config.getLang()) {
+                    if (codeinspect.getLang() != null && config.getLang() == codeinspect.getLang()) {
                         if (config.getTool() == null || config.getTool().isEmpty() ||
                                 config.getTool().equalsIgnoreCase(codeinspect.getTool())) {
-                            if (config.getContext() == null || codeinspect.getContext() == codeinspect.getContext()) {
+                            if (config.getContext() == null || config.getContext() == codeinspect.getContext()) {
                                 qualifiedClasses.add(codeinspect);
                             }
                         }
