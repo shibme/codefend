@@ -69,7 +69,6 @@ if test "${DOCKER_VERSION_RESPONSE#*$EXPECTED_RESPONSE}" != "$DOCKER_VERSION_RES
 
   echo "Starting container: $CODEINSPECT_CONTAINER"
   echo "$CODEINSPECT_COMMAND" | bash
-  docker rm $CODEINSPECT_CONTAINER
 else
   echo "Please install docker client before you begin."
   exit 1
