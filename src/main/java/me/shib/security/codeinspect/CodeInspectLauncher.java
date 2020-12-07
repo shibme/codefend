@@ -1,7 +1,6 @@
 package me.shib.security.codeinspect;
 
 import me.shib.steward.Steward;
-import me.shib.steward.StewardConfig;
 import me.shib.steward.StewardData;
 
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ final class CodeInspectLauncher {
                 findings.addAll(inspector.getFindings());
             }
             StewardData data = StewardAdapter.toStewardData(config, findings);
-            Steward.process(data, StewardConfig.getConfig());
+            Steward.process(data);
         } catch (Exception e) {
             throw new CodeInspectException(e);
         }
